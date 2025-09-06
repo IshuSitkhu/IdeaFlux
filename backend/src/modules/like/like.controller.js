@@ -1,9 +1,11 @@
 // like.controller.js
 
-import Like from './like.model.js';
+const Like = require("../like/like.model");
+const Blog = require("../blog/blog.model");
+const Notification = require("../notification/notification.model");
 
 // Get all likes
-export const getAllLikes = async (req, res) => {
+exports.getAllLikes = async (req, res) => {
   try {
     const likes = await Like.find();
     res.status(200).json(likes);
@@ -13,7 +15,7 @@ export const getAllLikes = async (req, res) => {
 };
 
 // Toggle Like
-export const toggleLike = async (req, res) => {
+exports.toggleLike = async (req, res) => {
   try {
     const blogId = req.params.id;
     const userId = req.user.id;
@@ -24,6 +26,17 @@ export const toggleLike = async (req, res) => {
       await existing.deleteOne();
     } else {
       await Like.create({ blogId, userId });
+      // Create notification for blog author (if not liking own blog)
+      const blog = await Blog.findById(blogId);
+      if (blog && String(blog.author) !== String(userId)) {
+        await Notification.create({
+          type: "like",
+          sender: userId,
+          receiver: blog.author,
+          message: `Your blog was liked`,
+          blogId: blog._id,
+        });
+      }
     }
 
     const totalLikes = await Like.countDocuments({ blogId });
@@ -41,7 +54,7 @@ export const toggleLike = async (req, res) => {
   }
 };
 
-export const getLikeStatus = async (req, res) => {
+exports.getLikeStatus = async (req, res) => {
   const userId = req.user.id; // or req.user._id if using mongoose
   const blogId = req.params.blogId;
 
@@ -58,4 +71,3 @@ export const getLikeStatus = async (req, res) => {
     res.status(500).json({ message: "Error checking like status" });
   }
 };
-

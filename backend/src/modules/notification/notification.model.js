@@ -20,7 +20,11 @@ const notificationSchema = new mongoose.Schema(
     message: {
       type: String,
     },
-    read: { 
+    blogId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Blog",
+    },
+    isRead: { 
       type: Boolean, 
       default: false 
     },

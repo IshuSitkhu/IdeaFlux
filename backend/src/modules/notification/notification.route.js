@@ -11,8 +11,8 @@ router.post("/mark-read/:userId", async (req, res) => {
   const userId = req.params.userId;
   try {
     await Notification.updateMany(
-      { receiver: userId, read: false },
-      { $set: { read: true } }
+      { receiver: userId, isRead: false }, // updated
+      { $set: { isRead: true } } // updated
     );
     res.status(200).json({ message: "Notifications marked as read" });
   } catch (err) {
@@ -20,5 +20,6 @@ router.post("/mark-read/:userId", async (req, res) => {
     res.status(500).json({ message: "Error marking notifications as read", error: err });
   }
 });
+
 
 module.exports = router;

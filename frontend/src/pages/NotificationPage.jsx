@@ -33,7 +33,8 @@ const NotificationPanel = () => {
     navigate(`/user/${senderId}`);
   };
 
-  const unreadCount = notifications.filter((n) => !n.read).length;
+  // ✅ Updated to use isRead
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   return (
     <div
@@ -84,23 +85,6 @@ const NotificationPanel = () => {
         >
           Notifications
         </h2>
-
-        {/* {unreadCount > 0 && (
-          <span
-            style={{
-              marginLeft: "auto",
-              backgroundColor: "#ef4444",
-              color: "#fff",
-              borderRadius: "9999px",
-              padding: "4px 12px",
-              fontWeight: 600,
-              fontSize: 14,
-              boxShadow: "0 0 6px rgba(239,68,68,0.4)",
-            }}
-          >
-            {unreadCount}
-          </span>
-        )} */}
       </div>
 
       {/* Notification List */}
@@ -130,7 +114,7 @@ const NotificationPanel = () => {
             <div
               key={n._id}
               style={{
-                background: n.read ? "#ffffff" : "#f0f9ff",
+                background: n.isRead ? "#ffffff" : "#f0f9ff", // ✅ Updated
                 border: "1px solid #e5e7eb",
                 borderRadius: 12,
                 padding: "16px 20px",
@@ -144,12 +128,10 @@ const NotificationPanel = () => {
                 }
               }}
               onMouseEnter={(e) =>
-                (e.currentTarget.style.boxShadow =
-                  "0 4px 12px rgba(0,0,0,0.08)")
+                (e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.08)")
               }
               onMouseLeave={(e) =>
-                (e.currentTarget.style.boxShadow =
-                  "0 2px 6px rgba(0,0,0,0.05)")
+                (e.currentTarget.style.boxShadow = "0 2px 6px rgba(0,0,0,0.05)")
               }
             >
               <div style={{ display: "flex", justifyContent: "space-between" }}>
