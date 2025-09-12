@@ -104,19 +104,20 @@ const AdminBlogs = () => {
         <button
           onClick={() => setShowForm(true)}
           style={{
-            marginBottom: 20,
-            padding: "10px 18px",
-            backgroundColor: "#3b82f6",
-            color: "#fff",
-            fontWeight: "bold",
-            border: "none",
-            borderRadius: 8,
-            cursor: "pointer",
-            boxShadow: "0 3px 6px rgba(0,0,0,0.1)",
-            transition: "all 0.2s",
-          }}
-          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#2563eb")}
-          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#3b82f6")}
+                width: "100%",
+                padding: "14px 0",
+                backgroundColor: "#2563eb",
+                color: "#fff",
+                border: "none",
+                borderRadius: "10px",
+                cursor: "pointer",
+                fontWeight: 600,
+                fontSize: "15px",
+                transition: "all 0.3s ease",
+                boxShadow: "0 3px 8px rgba(37,99,235,0.3)",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#1e40af")}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#2563eb")}
         >
           ➕ Add New Blog
         </button>

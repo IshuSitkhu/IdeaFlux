@@ -1,14 +1,11 @@
-
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-
-
 const BlogForm = () => {
   const navigate = useNavigate();
+
   const [form, setForm] = useState({
     title: "",
     image: null,
@@ -17,15 +14,37 @@ const BlogForm = () => {
   });
 
   const [preview, setPreview] = useState(null);
+  const [categories, setCategories] = useState([]);
 
+  // Clean up image preview URL
   useEffect(() => {
     return () => {
       if (preview) URL.revokeObjectURL(preview);
     };
   }, [preview]);
 
+  // Fetch categories from API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await axios.get("http://localhost:8000/api/admin/categories"); 
+        console.log("Categories API response:", res.data);
+
+        // Use the array from API; adjust according to your backend response
+        // e.g., res.data.categories if nested
+        setCategories(Array.isArray(res.data) ? res.data : res.data.categories || []);
+      } catch (err) {
+        console.error("Error fetching categories:", err.response || err.message);
+        toast.error("❌ Failed to fetch categories");
+        setCategories([]); // prevent crash
+      }
+    };
+    fetchCategories();
+  }, []);
+
   const handleChange = (e) => {
     const { name, value, files } = e.target;
+
     if (name === "image") {
       const file = files[0];
       setForm({ ...form, image: file });
@@ -43,11 +62,11 @@ const BlogForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const token = localStorage.getItem("token");
     let imageUrl = "";
 
     try {
+      // Upload image if selected
       if (form.image) {
         const imgData = new FormData();
         imgData.append("image", form.image);
@@ -62,10 +81,10 @@ const BlogForm = () => {
             },
           }
         );
-
         imageUrl = uploadRes.data.imageUrl;
       }
 
+      // Submit blog
       const res = await axios.post(
         "http://localhost:8000/api/blog",
         {
@@ -81,20 +100,15 @@ const BlogForm = () => {
         }
       );
 
-    toast.success("✅ Blog published successfully!");
-    navigate("/profile");
-      console.log(res.data);
+      toast.success("✅ Blog published successfully!");
+      navigate("/profile");
 
-      setForm({
-        title: "",
-        image: null,
-        content: "",
-        categories: "",
-      });
+      // Reset form
+      setForm({ title: "", image: null, content: "", categories: "" });
       setPreview(null);
     } catch (err) {
       console.error(err.response?.data || err.message);
-    toast.error("❌ Something went wrong while publishing!");
+      toast.error("❌ Something went wrong while publishing!");
     }
   };
 
@@ -102,12 +116,11 @@ const BlogForm = () => {
   const styles = {
     formContainer: {
       maxWidth: 950,
-      margin: " auto",
+      margin: "auto",
       padding: "28px",
       borderRadius: "20px",
       background: "linear-gradient(145deg, #ffffff 60%, #f1f5f9)",
-      boxShadow:
-        "0 8px 30px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.6)",
+      boxShadow: "0 8px 30px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.6)",
       fontFamily: "'Inter', sans-serif",
     },
     flexRow: {
@@ -143,20 +156,9 @@ const BlogForm = () => {
       boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
       transition: "all 0.3s ease",
     },
-    select: {
-      width: "100%",
-      padding: "12px 16px",
-      borderRadius: "12px",
-      border: "1px solid #e2e8f0",
-      fontSize: "15px",
-      background: "rgba(255,255,255,0.9)",
-      boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
-      transition: "all 0.3s ease",
-    },
     button: {
       padding: "14px 0",
-      background:
-        "linear-gradient(135deg, #2563eb 0%, #1e40af 100%)",
+      background: "linear-gradient(135deg, #2563eb 0%, #1e40af 100%)",
       color: "#fff",
       fontSize: "17px",
       borderRadius: "12px",
@@ -167,12 +169,6 @@ const BlogForm = () => {
       boxShadow: "0 6px 16px rgba(37,99,235,0.35)",
       transition: "all 0.3s ease",
     },
-    buttonHover: {
-      background:
-        "linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%)",
-      transform: "translateY(-2px)",
-      boxShadow: "0 8px 20px rgba(37,99,235,0.45)",
-    },
     previewWrapper: {
       width: 260,
       height: 220,
@@ -181,12 +177,10 @@ const BlogForm = () => {
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-      background:
-        "linear-gradient(135deg, #f8fafc, #e2e8f0)",
+      background: "linear-gradient(135deg, #f8fafc, #e2e8f0)",
       overflow: "hidden",
       border: "1px solid #e2e8f0",
-      boxShadow:
-        "inset 0 2px 8px rgba(0,0,0,0.05), 0 4px 12px rgba(0,0,0,0.08)",
+      boxShadow: "inset 0 2px 8px rgba(0,0,0,0.05), 0 4px 12px rgba(0,0,0,0.08)",
       transition: "all 0.3s ease",
     },
     previewImage: {
@@ -203,8 +197,6 @@ const BlogForm = () => {
       fontSize: 14,
     },
   };
-
-
 
   return (
     <form style={styles.formContainer} onSubmit={handleSubmit}>
@@ -225,27 +217,28 @@ const BlogForm = () => {
             value={form.categories}
             onChange={handleChange}
             required
-            style={styles.select}
+            style={{
+              width: "100%",
+              padding: "14px 16px",
+              borderRadius: "12px",
+              border: "1px solid #e2e8f0",
+              fontSize: "16px",
+              background: "rgba(255,255,255,0.95)",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+              transition: "all 0.3s ease",
+              cursor: "pointer",
+              color: "#1f2937",
+            }}
           >
             <option value="" disabled>
               Select a category
             </option>
-            <option value="Technology">Technology</option>
-            <option value="Programming">Programming</option>
-            <option value="Lifestyle">Lifestyle</option>
-            <option value="Entertainment">Entertainment</option>
-            <option value="Music">Music</option>
-            <option value="Movies">Movies</option>
-            <option value="Sports">Sports</option>
-            <option value="Travel">Travel</option>
-            <option value="Food">Food</option>
-            <option value="Nature">Nature</option>
-            <option value="Health">Health</option>
-            <option value="Education">Education</option>
-            <option value="Bollywood">Bollywood</option>
-            <option value="Fashion">Fashion</option>
-            <option value="Personal">Personal</option>
-            <option value="News">News</option>
+            {Array.isArray(categories) &&
+              categories.map((cat) => (
+                <option key={cat._id || cat.id} value={cat.name}>
+                  {cat.name}
+                </option>
+              ))}
           </select>
 
           <textarea
@@ -255,7 +248,7 @@ const BlogForm = () => {
             onChange={handleChange}
             required
             style={styles.textarea}
-          ></textarea>
+          />
 
           <input
             type="file"
@@ -271,7 +264,6 @@ const BlogForm = () => {
             style={styles.button}
             onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#1e40af")}
             onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#2563eb")}
-            color="#fff"
           >
             Publish Blog
           </button>
@@ -279,11 +271,7 @@ const BlogForm = () => {
 
         <div style={styles.previewWrapper}>
           {preview ? (
-            <img
-              src={preview}
-              alt="Selected preview"
-              style={styles.previewImage}
-            />
+            <img src={preview} alt="Selected preview" style={styles.previewImage} />
           ) : (
             <p style={styles.previewText}>Image preview will appear here</p>
           )}

@@ -9,6 +9,7 @@ import {
   faRightFromBracket,
   faChevronLeft,
   faChevronRight,
+  faList,
 } from "@fortawesome/free-solid-svg-icons";
 import "./AdminLayout.css"; // optional, create for styling
 import AdminNavbar from "../AdminNavbar";
@@ -64,6 +65,11 @@ const AdminLayout = () => {
                 <FontAwesomeIcon icon={faPen} style={iconStyle} />
                 {!isCollapsed && <span>Blogs</span>}
               </Link>
+              <Link className="sidebar-link" to="/admin/categories">
+                <FontAwesomeIcon icon={faList} style={iconStyle} />
+                {!isCollapsed && <span>Categories</span>}
+              </Link>
+
 
               <button onClick={handleLogout} className="sidebar-link logout-btn">
                 <FontAwesomeIcon icon={faRightFromBracket} style={iconStyle} />

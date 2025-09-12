@@ -19,11 +19,13 @@ import RecommendPage from "./pages/RecommendPage";
 import RecommendationResult from "./pages/RecommendationResult";
 import NotificationDropDown from "./components/NotificationDropdown";
 import NotificationsPage from "./pages/NotificationPage";
+import NotFound from "./pages/NotFound";
 
 import AdminUsers from "./pages/AdminUsers";
 import AdminBlogs from "./pages/AdminBlogs";
 import AdminPage from "./pages/AdminPage";
 import AdminUpdate from "./pages/AdminUpdate";
+import AdminCategories from "./pages/AdminCategories";
 
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
@@ -73,6 +75,7 @@ function App() {
           <Route index element={<AdminPage />} />
           <Route path="users" element={<AdminUsers />} />
           <Route path="blogs" element={<AdminBlogs />} />
+          <Route path="categories" element={<AdminCategories />} />
         </Route>
 
         {/* Admin-specific routes (still protected) */}
@@ -91,7 +94,13 @@ function App() {
         <Route path="/activate/:token" element={<ActivateAccount />} />
 
         {/* Fallback route */}
-        <Route path="*" element={<div>Page Not Found</div>} />
+        <Route path="*" element={<div><h1 className="text-7xl font-bold text-red-500 mb-4">404</h1>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+            Oops! Page not found
+          </h2>
+          <p className="text-gray-600 mb-6">
+            The page you’re looking for doesn’t exist or you don’t have permission to view it.
+          </p></div>} />
       </Routes>
     </Router>
   );
