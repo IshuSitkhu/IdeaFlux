@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-const AdminBlogForm = ({ blog = null, onSuccess, onCancelEdit }) => {
+const AdminBlogForm = ({ blog = null, onSuccess, onCancelEdit, showForm = false }) => {
   const token = localStorage.getItem("token");
 
   const [form, setForm] = useState({
@@ -18,7 +18,7 @@ const AdminBlogForm = ({ blog = null, onSuccess, onCancelEdit }) => {
   const [previewObjectUrl, setPreviewObjectUrl] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // fetch authors for dropdown
+  // fetch authors
   useEffect(() => {
     if (!token) return;
     const fetchUsers = async () => {
@@ -29,7 +29,6 @@ const AdminBlogForm = ({ blog = null, onSuccess, onCancelEdit }) => {
         const usersList = res.data?.users || [];
         setUsers(usersList);
 
-        // default author = current user if available
         if (!blog && usersList.length) {
           const currentUser = JSON.parse(localStorage.getItem("user"));
           const cur =
@@ -38,19 +37,15 @@ const AdminBlogForm = ({ blog = null, onSuccess, onCancelEdit }) => {
         }
       } catch (err) {
         console.error("Failed fetching users:", err.response?.data || err.message);
-        toast.error("Failed to load authors (check console).");
+        toast.error("Failed to load authors.");
       }
     };
-
     fetchUsers();
   }, [token, blog]);
 
-  // when editing, populate form
+  // populate form when editing
   useEffect(() => {
-    if (previewObjectUrl) {
-      URL.revokeObjectURL(previewObjectUrl);
-      setPreviewObjectUrl(null);
-    }
+    if (previewObjectUrl) URL.revokeObjectURL(previewObjectUrl);
 
     setForm({
       title: blog?.title || "",
@@ -69,12 +64,9 @@ const AdminBlogForm = ({ blog = null, onSuccess, onCancelEdit }) => {
     setPreview(blog?.image || null);
   }, [blog]);
 
-  // cleanup object URL on unmount
   useEffect(() => {
     return () => {
-      if (previewObjectUrl) {
-        URL.revokeObjectURL(previewObjectUrl);
-      }
+      if (previewObjectUrl) URL.revokeObjectURL(previewObjectUrl);
     };
   }, [previewObjectUrl]);
 
@@ -83,10 +75,7 @@ const AdminBlogForm = ({ blog = null, onSuccess, onCancelEdit }) => {
     if (name === "image") {
       const file = files?.[0] || null;
 
-      if (previewObjectUrl) {
-        URL.revokeObjectURL(previewObjectUrl);
-        setPreviewObjectUrl(null);
-      }
+      if (previewObjectUrl) URL.revokeObjectURL(previewObjectUrl);
 
       if (file) {
         const objUrl = URL.createObjectURL(file);
@@ -102,7 +91,6 @@ const AdminBlogForm = ({ blog = null, onSuccess, onCancelEdit }) => {
     }
   };
 
-  // Unified error parser
   const parseAndShowError = (err) => {
     console.error("Request error:", err);
     const data = err?.response?.data;
@@ -132,12 +120,11 @@ const AdminBlogForm = ({ blog = null, onSuccess, onCancelEdit }) => {
     if (!form.content?.trim()) return toast.error("Content is required");
     if (!form.categories) return toast.error("Category is required");
     if (!form.author) return toast.error("Author is required");
-    if (!token) return toast.error("You must be logged in (missing token)");
+    if (!token) return toast.error("You must be logged in");
 
     setLoading(true);
 
     try {
-      // upload new image if selected
       let imageUrl = blog?.image || "";
       if (imageFile) {
         const imgData = new FormData();
@@ -162,12 +149,9 @@ const AdminBlogForm = ({ blog = null, onSuccess, onCancelEdit }) => {
           uploadRes.data?.image ||
           "";
 
-        if (!imageUrl) {
-          throw new Error("Upload succeeded but no image URL returned");
-        }
+        if (!imageUrl) throw new Error("Upload succeeded but no image URL returned");
       }
 
-      // payload
       const payload = {
         title: form.title,
         image: imageUrl,
@@ -182,21 +166,18 @@ const AdminBlogForm = ({ blog = null, onSuccess, onCancelEdit }) => {
           payload,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        toast.success("Blog updated");
+        toast.success("Blog updated successfully!");
       } else {
         await axios.post("http://localhost:8000/api/admin/blogs", payload, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        toast.success("Blog created");
+        toast.success("Blog created successfully!");
       }
 
-      // reset form
       setForm({ title: "", content: "", categories: "", author: "" });
       setImageFile(null);
-      if (previewObjectUrl) {
-        URL.revokeObjectURL(previewObjectUrl);
-        setPreviewObjectUrl(null);
-      }
+      if (previewObjectUrl) URL.revokeObjectURL(previewObjectUrl);
+      setPreviewObjectUrl(null);
       setPreview(null);
 
       onSuccess?.();
@@ -207,11 +188,8 @@ const AdminBlogForm = ({ blog = null, onSuccess, onCancelEdit }) => {
     }
   };
 
-  const handleCancelEdit = () => {
-    if (previewObjectUrl) {
-      URL.revokeObjectURL(previewObjectUrl);
-      setPreviewObjectUrl(null);
-    }
+  const handleCancel = () => {
+    if (previewObjectUrl) URL.revokeObjectURL(previewObjectUrl);
     setImageFile(null);
     setPreview(null);
     setForm({ title: "", content: "", categories: "", author: "" });
@@ -219,10 +197,25 @@ const AdminBlogForm = ({ blog = null, onSuccess, onCancelEdit }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ marginBottom: 30 }}>
-      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+    <form
+      onSubmit={handleSubmit}
+      style={{
+        marginBottom: 30,
+        padding: 20,
+        backgroundColor: "#fff",
+        borderRadius: 10,
+        boxShadow: "0 3px 10px rgba(0,0,0,0.1)",
+      }}
+    >
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 12 }}>
         <input
-          style={{ flex: "1 1 300px", padding: 8 }}
+          style={{
+            flex: "1 1 300px",
+            padding: 10,
+            borderRadius: 6,
+            border: "1px solid #d1d5db",
+            boxShadow: "inset 0 1px 2px rgba(0,0,0,0.05)",
+          }}
           type="text"
           name="title"
           placeholder="Title"
@@ -232,7 +225,13 @@ const AdminBlogForm = ({ blog = null, onSuccess, onCancelEdit }) => {
         />
 
         <select
-          style={{ width: 200, padding: 8 }}
+          style={{
+            width: 200,
+            padding: 10,
+            borderRadius: 6,
+            border: "1px solid #d1d5db",
+            backgroundColor: "#fff",
+          }}
           name="categories"
           value={form.categories}
           onChange={handleChange}
@@ -266,7 +265,13 @@ const AdminBlogForm = ({ blog = null, onSuccess, onCancelEdit }) => {
         </select>
 
         <select
-          style={{ width: 300, padding: 8 }}
+          style={{
+            width: 300,
+            padding: 10,
+            borderRadius: 6,
+            border: "1px solid #d1d5db",
+            backgroundColor: "#fff",
+          }}
           name="author"
           value={form.author}
           onChange={handleChange}
@@ -284,7 +289,15 @@ const AdminBlogForm = ({ blog = null, onSuccess, onCancelEdit }) => {
       </div>
 
       <textarea
-        style={{ width: "100%", minHeight: 160, marginTop: 12, padding: 8 }}
+        style={{
+          width: "100%",
+          minHeight: 160,
+          marginTop: 8,
+          padding: 10,
+          borderRadius: 6,
+          border: "1px solid #d1d5db",
+          boxShadow: "inset 0 1px 2px rgba(0,0,0,0.05)",
+        }}
         name="content"
         placeholder="Content"
         value={form.content}
@@ -293,7 +306,12 @@ const AdminBlogForm = ({ blog = null, onSuccess, onCancelEdit }) => {
       />
 
       <div
-        style={{ display: "flex", gap: 12, alignItems: "center", marginTop: 12 }}
+        style={{
+          display: "flex",
+          gap: 12,
+          alignItems: "center",
+          marginTop: 12,
+        }}
       >
         <input type="file" name="image" accept="image/*" onChange={handleChange} />
         {preview && (
@@ -301,29 +319,56 @@ const AdminBlogForm = ({ blog = null, onSuccess, onCancelEdit }) => {
             src={preview}
             alt="Preview"
             width={120}
-            style={{ display: "block", marginLeft: 8, borderRadius: 6 }}
+            style={{
+              display: "block",
+              marginLeft: 8,
+              borderRadius: 6,
+              boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+            }}
           />
         )}
       </div>
 
-      <div style={{ marginTop: 12, display: "flex", gap: 8 }}>
-        <button type="submit" disabled={loading} style={{ padding: "8px 12px" }}>
+      <div style={{ marginTop: 16, display: "flex", gap: 10 }}>
+        <button
+          type="submit"
+          disabled={loading}
+          style={{
+            padding: "10px 16px",
+            borderRadius: 6,
+            border: "none",
+            backgroundColor: "#2563eb",
+            color: "#fff",
+            cursor: "pointer",
+            fontWeight: "bold",
+            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+            transition: "all 0.2s",
+          }}
+          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#1d4ed8")}
+          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#2563eb")}
+        >
           {loading ? "Saving..." : blog ? "Update Blog" : "Create Blog"}
         </button>
 
-        {blog && (
-          <button
-            type="button"
-            onClick={handleCancelEdit}
-            style={{
-              padding: "8px 12px",
-              background: "#e5e7eb",
-              border: "none",
-            }}
-          >
-            Cancel Edit
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={handleCancel}
+          style={{
+            padding: "10px 16px",
+            borderRadius: 6,
+            border: "none",
+            backgroundColor: "#e5e7eb",
+            color: "#374151",
+            cursor: "pointer",
+            fontWeight: "bold",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+            transition: "all 0.2s",
+          }}
+          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#d1d5db")}
+          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#e5e7eb")}
+        >
+          Cancel
+        </button>
       </div>
     </form>
   );

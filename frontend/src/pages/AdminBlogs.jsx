@@ -7,6 +7,9 @@ import AdminBlogForm from "../components/AdminBlogForm";
 const AdminBlogs = () => {
   const [blogs, setBlogs] = useState([]);
   const [editingBlog, setEditingBlog] = useState(null);
+  const [showForm, setShowForm] = useState(false); // for Add Blog
+  const [currentPage, setCurrentPage] = useState(1);
+  const blogsPerPage = 5; // adjust per page
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
@@ -16,7 +19,11 @@ const AdminBlogs = () => {
       const res = await axios.get("http://localhost:8000/api/admin/blogs", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setBlogs(res.data.blogs || []);
+      // Order by DESC (latest first)
+      const sortedBlogs = (res.data.blogs || []).sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+      setBlogs(sortedBlogs);
     } catch (err) {
       console.error(err.response?.data || err.message);
       toast.error("Failed to fetch blogs");
@@ -46,29 +53,90 @@ const AdminBlogs = () => {
   const handleEdit = (id) => {
     const blogToEdit = blogs.find((b) => b._id === id);
     if (blogToEdit) {
-      // normalize categories for form (always array)
       blogToEdit.categories =
         Array.isArray(blogToEdit.categories) && blogToEdit.categories.length
           ? blogToEdit.categories
           : [];
       setEditingBlog(blogToEdit);
+      setShowForm(false);
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
-  return (
-    <div style={{ padding: 20 }}>
-      <h2>Admin Blogs</h2>
+  // Pagination calculation
+  const totalPages = Math.ceil(blogs.length / blogsPerPage);
+  const indexOfLastBlog = currentPage * blogsPerPage;
+  const indexOfFirstBlog = indexOfLastBlog - blogsPerPage;
+  const currentBlogs = blogs.slice(indexOfFirstBlog, indexOfLastBlog);
 
-      {/* Blog Form */}
-      <AdminBlogForm
-        blog={editingBlog}
-        onSuccess={() => {
-          setEditingBlog(null);
-          fetchBlogs();
+  const paginationBtnStyle = (disabled) => ({
+    padding: "6px 12px",
+    borderRadius: 6,
+    border: "none",
+    cursor: disabled ? "not-allowed" : "pointer",
+    backgroundColor: disabled ? "#d1d5db" : "#3b82f6",
+    color: "#fff",
+    fontWeight: "bold",
+  });
+
+  return (
+    <div
+      style={{
+        padding: 20,
+        minHeight: "100vh",
+        backgroundColor: "#f0f4f8",
+        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+      }}
+    >
+      <h1
+        style={{
+          fontSize: "2rem",
+          fontWeight: "bold",
+          marginBottom: 20,
+          color: "#1f2937",
         }}
-        onCancelEdit={() => setEditingBlog(null)}
-      />
+      >
+        Admin Panel - Manage Blogs
+      </h1>
+
+      {/* Add Blog Button */}
+      {!showForm && !editingBlog && (
+        <button
+          onClick={() => setShowForm(true)}
+          style={{
+            marginBottom: 20,
+            padding: "10px 18px",
+            backgroundColor: "#3b82f6",
+            color: "#fff",
+            fontWeight: "bold",
+            border: "none",
+            borderRadius: 8,
+            cursor: "pointer",
+            boxShadow: "0 3px 6px rgba(0,0,0,0.1)",
+            transition: "all 0.2s",
+          }}
+          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#2563eb")}
+          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#3b82f6")}
+        >
+          ➕ Add New Blog
+        </button>
+      )}
+
+      {/* Blog Form (Add or Edit) */}
+      {(showForm || editingBlog) && (
+        <AdminBlogForm
+          blog={editingBlog || null}
+          onSuccess={() => {
+            setEditingBlog(null);
+            setShowForm(false);
+            fetchBlogs();
+          }}
+          onCancelEdit={() => {
+            setEditingBlog(null);
+            setShowForm(false);
+          }}
+        />
+      )}
 
       {/* Blog Table */}
       <table
@@ -94,16 +162,16 @@ const AdminBlogs = () => {
           </tr>
         </thead>
         <tbody>
-          {blogs.length === 0 ? (
+          {currentBlogs.length === 0 ? (
             <tr>
               <td colSpan="7" style={{ textAlign: "center", padding: 20 }}>
                 No blogs found
               </td>
             </tr>
           ) : (
-            blogs.map((blog, idx) => (
+            currentBlogs.map((blog, idx) => (
               <tr key={blog._id} style={{ borderBottom: "1px solid #e5e7eb" }}>
-                <td style={{ padding: 12 }}>{idx + 1}</td>
+                <td style={{ padding: 12 }}>{indexOfFirstBlog + idx + 1}</td>
                 <td style={{ padding: 12 }}>
                   {blog.image && (
                     <img
@@ -135,6 +203,7 @@ const AdminBlogs = () => {
                     onClick={() => handleEdit(blog._id)}
                     style={{
                       marginRight: 6,
+                      marginBottom:8,
                       padding: "6px 12px",
                       borderRadius: 6,
                       border: "none",
@@ -164,6 +233,37 @@ const AdminBlogs = () => {
           )}
         </tbody>
       </table>
+
+      {/* Pagination */}
+      {blogs.length > blogsPerPage && (
+        <div
+          style={{
+            marginTop: 20,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: 20,
+          }}
+        >
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            style={paginationBtnStyle(currentPage === 1)}
+          >
+            Previous
+          </button>
+          <span style={{ fontWeight: "bold", color: "#374151" }}>
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            style={paginationBtnStyle(currentPage === totalPages)}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 };

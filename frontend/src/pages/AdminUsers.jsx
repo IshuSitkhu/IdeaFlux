@@ -127,7 +127,7 @@ const AdminUsers = () => {
   // Styling helpers
   const actionBtnStyle = (bgColor, width = 36) => ({
     marginRight: 6,
-    padding: "6px 8px",
+    padding: "6px 12px",
     backgroundColor: bgColor,
     color: "#fff",
     fontWeight: "bold",
@@ -197,15 +197,15 @@ const AdminUsers = () => {
             <tr key={u._id} style={{ borderBottom: "1px solid #e5e7eb", transition: "background-color 0.2s", cursor: "default" }}
                 onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#f1f5f9"}
                 onMouseOut={(e) => e.currentTarget.style.backgroundColor = "#fff"}>
-              <td style={{ padding: 12 }}>{indexOfFirstUser + idx + 1}</td>
-              <td style={{ padding: 12 }}>{u.name}</td>
-              <td style={{ padding: 12 }}>{u.email}</td>
-              <td style={{ padding: 12 }}>{u.gender}</td>
-              <td style={{ padding: 12, color: u.role === "admin" ? "green" : u.role === "reader" ? "#ef4444" : "#111" }}>{u.role}</td>
-              <td style={{ padding: 12, textAlign: "center" }}>
+              <td style={{ padding: 12, fontSize:18 }}>{indexOfFirstUser + idx + 1}</td>
+              <td style={{ padding: 12,  fontSize:18  }}>{u.name}</td>
+              <td style={{ padding: 12,  fontSize:18  }}>{u.email}</td>
+              <td style={{ padding: 12 ,  fontSize:18 }}>{u.gender}</td>
+              <td style={{ padding: 12, color: u.role === "admin" ? "green" : u.role === "reader" ? "#ef4444" : "#111" ,  fontSize:20 }}>{u.role}</td>
+              <td style={{ padding: 12, textAlign: "center",  fontSize:18  }}>
                 {/* {u.role !== "admin" && <button style={actionBtnStyle("#10b981", 30)} onClick={() => handlePromote(u)}>➕Promote</button>} */}
-                <button style={actionBtnStyle("#0386aaff", 30)} onClick={() => setEditUser(u)}>Edit</button>
-                <button style={actionBtnStyle("#ef4444", 30)} onClick={() => handleDelete(u._id)}>Delete</button>
+                <button style={actionBtnStyle("#2563eb", 30)} onClick={() => setEditUser(u)}>Edit</button>
+                <button style={actionBtnStyle("#dc2626", 30)} onClick={() => handleDelete(u._id)}>Delete</button>
               </td>
             </tr>
           ))}
