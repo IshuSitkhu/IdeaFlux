@@ -24,17 +24,19 @@ const verifyToken = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     // 🔍 Fetch user from DB to get full info
-    const user = await User.findById(decoded.id).select("username name email");
+    const user = await User.findById(decoded.id).select("username name email role");
 
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
     // ✅ Attach user info to req.user
-    req.user = {
+      req.user = {
       id: user._id.toString(),
-      name: user.name || user.username, // support both if needed
+      name: user.name || user.username,
+      role: user.role, // include role
     };
+
 
     console.log("✅ Token Verified User ID:", req.user.id);
 

@@ -1,5 +1,6 @@
 const User = require("./user.model");
 const Blog = require("../../modules/blog/blog.model");
+const userService = require("./user.service")
 
 exports.getUserProfileAndBlogs = async (req, res) => {
   try {
@@ -58,3 +59,16 @@ exports.searchUsers = async (req, res) => {
 };
 
 
+// ✅ Admin-only: create new user with role
+exports.adminCreateUser = async (req, res) => {
+  try {
+    const { name, email, password, gender, bio, role } = req.body;
+
+    // Only allow admin access via middleware
+    const user = await userService.adminCreateUser({ name, email, password, gender, bio, role });
+
+    res.status(201).json({ success: true, message: "User created successfully", user });
+  } catch (err) {
+    res.status(err.status || 500).json({ success: false, message: err.message || "Server error" });
+  }
+};

@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const User = require("./user.model");
-const { getUserProfileAndBlogs , searchUsers } = require("./user.controller");
+const { getUserProfileAndBlogs , searchUsers , adminCreateUser } = require("./user.controller");
 const Notification = require("../notification/notification.model"); // ✅ ADD THIS
 const verifyToken = require("../../middleware/auth.middleware"); // or adjust path as needed
+const authorize = require("../../middleware/authorize.middleware");
 
 
 // ✅ Activate Account
@@ -99,6 +100,8 @@ router.post("/follow/:userId", async (req, res) => {
   }
 });
 
+
+router.post("/admin/create", verifyToken, authorize("admin"), adminCreateUser);
 
 
 module.exports = router;

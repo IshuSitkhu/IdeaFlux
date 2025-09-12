@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -22,11 +21,18 @@ const Login = () => {
       const res = await axios.post("http://localhost:8000/api/auth/login", form);
       const { token, user } = res.data;
 
+      // Save user info and token
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
 
       toast.success("✅ Login successful!");
-      navigate("/");
+
+      // ✅ Redirect based on role
+      if (user.role === "admin") {
+        navigate("/admin"); // admin dashboard
+      } else {
+        navigate("/"); // normal user dashboard
+      }
     } catch (err) {
       const msg = err.response?.data?.message || "Login failed. Try again.";
       setError(msg);
@@ -64,16 +70,16 @@ const Login = () => {
         <p className="register-text">
           Don’t have an account?{" "}
           <button
-                type="button"
-                onClick={() => navigate("/register")}
-                style={{
-                  background: "none",
-                  border: "none",
-                  color: "#4f46e5",
-                  cursor: "pointer",
-                  textDecoration: "underline",
-                }}
-              >
+            type="button"
+            onClick={() => navigate("/register")}
+            style={{
+              background: "none",
+              border: "none",
+              color: "#4f46e5",
+              cursor: "pointer",
+              textDecoration: "underline",
+            }}
+          >
             Register here
           </button>
         </p>

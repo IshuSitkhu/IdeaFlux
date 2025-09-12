@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import "./Register.css"; // same structure as Login.css
+import "./Register.css";
 
 const Register = () => {
   const [form, setForm] = useState({
@@ -79,9 +79,7 @@ const Register = () => {
             required
             className="login-input"
           />
-          <p className={`error-text ${errors.name ? "show" : ""}`}>
-            {errors.name || " "}
-          </p>
+          <p className={`error-text ${errors.name ? "show" : ""}`}>{errors.name || " "}</p>
 
           <input
             type="email"
@@ -92,9 +90,7 @@ const Register = () => {
             required
             className="login-input"
           />
-          <p className={`error-text ${errors.email ? "show" : ""}`}>
-            {errors.email || " "}
-          </p>
+          <p className={`error-text ${errors.email ? "show" : ""}`}>{errors.email || " "}</p>
 
           <input
             type="password"
@@ -105,9 +101,7 @@ const Register = () => {
             required
             className="login-input"
           />
-          <p className={`error-text ${errors.password ? "show" : ""}`}>
-            {errors.password || " "}
-          </p>
+          <p className={`error-text ${errors.password ? "show" : ""}`}>{errors.password || " "}</p>
 
           <input
             type="password"
@@ -140,11 +134,7 @@ const Register = () => {
 
         <p className="register-text">
           Already have an account?{" "}
-          <button
-            type="button"
-            onClick={() => navigate("/login")}
-            className="register-btn"
-          >
+          <button type="button" onClick={() => navigate("/login")} className="register-btn">
             Login here
           </button>
         </p>
