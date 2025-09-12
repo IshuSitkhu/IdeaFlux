@@ -1,29 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 
 const AdminPage = () => {
   const navigate = useNavigate();
-  const [stats, setStats] = useState({ users: 0, blogs: 0 });
-
-  useEffect(() => {
-    // Fetch stats from backend
-    const fetchStats = async () => {
-      try {
-        const resUsers = await fetch("http://localhost:8000/api/admin/users/count");
-        const usersData = await resUsers.json();
-
-        const resBlogs = await fetch("http://localhost:8000/api/admin/blogs/count");
-        const blogsData = await resBlogs.json();
-
-        setStats({ users: usersData.count, blogs: blogsData.count });
-      } catch (err) {
-        console.error(err);
-        alert("Error fetching stats.");
-      }
-    };
-
-    fetchStats();
-  }, []);
 
   return (
     <div style={{ padding: "24px", minHeight: "100vh", backgroundColor: "#f3f4f6" }}>
@@ -32,7 +11,7 @@ const AdminPage = () => {
       </h1>
 
       <div style={{ display: "flex", gap: "24px", flexWrap: "wrap" }}>
-        {/* Total Users */}
+        {/* Users */}
         <div style={{
           flex: "1 1 200px",
           background: "#fff",
@@ -40,12 +19,10 @@ const AdminPage = () => {
           borderRadius: "8px",
           boxShadow: "0 4px 6px rgba(0,0,0,0.1)"
         }}>
-          <h2 style={{ fontSize: "20px", fontWeight: "600", marginBottom: "12px" }}>Total Users</h2>
-          <p style={{ fontSize: "24px", fontWeight: "bold", color: "#2563eb" }}>{stats.users}</p>
+          <h2 style={{ fontSize: "20px", fontWeight: "600", marginBottom: "12px" }}>Users</h2>
           <button
             onClick={() => navigate("/admin/users")}
             style={{
-              marginTop: "12px",
               padding: "8px 16px",
               background: "#2563eb",
               color: "#fff",
@@ -58,7 +35,7 @@ const AdminPage = () => {
           </button>
         </div>
 
-        {/* Total Blogs */}
+        {/* Blogs */}
         <div style={{
           flex: "1 1 200px",
           background: "#fff",
@@ -66,12 +43,10 @@ const AdminPage = () => {
           borderRadius: "8px",
           boxShadow: "0 4px 6px rgba(0,0,0,0.1)"
         }}>
-          <h2 style={{ fontSize: "20px", fontWeight: "600", marginBottom: "12px" }}>Total Blogs</h2>
-          <p style={{ fontSize: "24px", fontWeight: "bold", color: "#16a34a" }}>{stats.blogs}</p>
+          <h2 style={{ fontSize: "20px", fontWeight: "600", marginBottom: "12px" }}>Blogs</h2>
           <button
             onClick={() => navigate("/admin/blogs")}
             style={{
-              marginTop: "12px",
               padding: "8px 16px",
               background: "#16a34a",
               color: "#fff",
@@ -81,6 +56,30 @@ const AdminPage = () => {
             }}
           >
             Manage Blogs
+          </button>
+        </div>
+
+        {/* Categories */}
+        <div style={{
+          flex: "1 1 200px",
+          background: "#fff",
+          padding: "24px",
+          borderRadius: "8px",
+          boxShadow: "0 4px 6px rgba(0,0,0,0.1)"
+        }}>
+          <h2 style={{ fontSize: "20px", fontWeight: "600", marginBottom: "12px" }}>Categories</h2>
+          <button
+            onClick={() => navigate("/admin/categories")}
+            style={{
+              padding: "8px 16px",
+              background: "#f59e0b",
+              color: "#fff",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer"
+            }}
+          >
+            Manage Categories
           </button>
         </div>
       </div>
