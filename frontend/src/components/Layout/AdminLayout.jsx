@@ -1,7 +1,6 @@
 // src/components/Layout/AdminLayout.jsx
 import React, { useState } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
-import Navbar from "../Navbar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUsers,
@@ -12,6 +11,7 @@ import {
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
 import "./AdminLayout.css"; // optional, create for styling
+import AdminNavbar from "../AdminNavbar";
 
 const AdminLayout = () => {
   const navigate = useNavigate();
@@ -41,7 +41,7 @@ const AdminLayout = () => {
 
   return (
     <div className="app-container">
-      <Navbar />
+      <AdminNavbar/>
 
       <div className="main-content-area" style={{ display: "flex" }}>
         {/* Sidebar */}

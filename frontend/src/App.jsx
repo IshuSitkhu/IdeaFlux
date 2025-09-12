@@ -1,8 +1,8 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
-import MainLayout from "./components/Layout/MainLayout"; // layout for normal users
-import AdminLayout from "./components/Layout/AdminLayout"; // layout for admin
+import MainLayout from "./components/Layout/MainLayout"; 
+import AdminLayout from "./components/Layout/AdminLayout"; 
 
 import Register from "./pages/Register";
 import Login from "./pages/Login";
@@ -29,13 +29,23 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 
+//  Admin route protection
+const AdminRoute = ({ children }) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  if (!user || user.role !== "admin") {
+    // not logged in or not admin → show 404
+    return <div>Page Not Found</div>;
+  }
+  return children;
+};
+
 function App() {
   return (
     <Router>
       <ToastContainer position="top-center" autoClose={3000} />
 
       <Routes>
-        {/* Routes under MainLayout (with sidebar + top navbar) */}
+        {/* Routes under MainLayout (normal users) */}
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/dashboard" element={<Dashboard />} />
@@ -51,17 +61,31 @@ function App() {
           <Route path="/notification-page" element={<NotificationsPage />} />
         </Route>
 
-        {/* Admin routes under AdminLayout */}
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<AdminPage />} /> {/* default admin page */}
+        {/*  Admin routes */}
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminLayout />
+            </AdminRoute>
+          }
+        >
+          <Route index element={<AdminPage />} />
           <Route path="users" element={<AdminUsers />} />
           <Route path="blogs" element={<AdminBlogs />} />
         </Route>
 
-        {/* Existing admin-specific routes */}
-        <Route path="/admin-update-blog/:id" element={<AdminUpdate />} />
+        {/* Admin-specific routes (still protected) */}
+        <Route
+          path="/admin-update-blog/:id"
+          element={
+            <AdminRoute>
+              <AdminUpdate />
+            </AdminRoute>
+          }
+        />
 
-        {/* Public/auth routes outside layout */}
+        {/* Public/auth routes */}
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/activate/:token" element={<ActivateAccount />} />
