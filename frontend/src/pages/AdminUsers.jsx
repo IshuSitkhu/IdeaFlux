@@ -9,7 +9,7 @@ const AdminUsers = () => {
   const [showForm, setShowForm] = useState(false);
   const [editUser, setEditUser] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const usersPerPage = 4;
+  const usersPerPage = 5;
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -101,22 +101,6 @@ const AdminUsers = () => {
     }
   };
 
-  const handlePromote = async (user) => {
-    try {
-      const res = await fetch(`http://localhost:8000/api/admin/users/${user._id}`, {
-        method: "PATCH",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ role: "admin" }),
-      });
-      const body = await res.json();
-      if (!res.ok) throw new Error(body.message || "Promote failed");
-      setUsers((prev) => prev.map((u) => (u._id === user._id ? body.user : u)));
-      alert("User promoted to admin");
-    } catch (err) {
-      alert("Error promoting user: " + err.message);
-    }
-  };
-
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
@@ -125,7 +109,7 @@ const AdminUsers = () => {
   if (loading) return <p style={{ padding: 20 }}>Loading users...</p>;
 
   // Styling helpers
-  const actionBtnStyle = (bgColor, width = 36) => ({
+  const actionBtnStyle = (bgColor) => ({
     marginRight: 6,
     padding: "6px 12px",
     backgroundColor: bgColor,
@@ -136,7 +120,7 @@ const AdminUsers = () => {
     cursor: "pointer",
     transition: "all 0.2s",
     boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-    minWidth: width,
+    width:"70px",
     marginBottom:6,
   });
 
@@ -150,6 +134,7 @@ const AdminUsers = () => {
     cursor: disabled ? "not-allowed" : "pointer",
     boxShadow: disabled ? "none" : "0 2px 5px rgba(0,0,0,0.1)",
     transition: "all 0.2s",
+    width:"100px",
   });
 
   return (
@@ -182,40 +167,42 @@ const AdminUsers = () => {
         </button>
       )}
 
-      <table style={{ width: "100%", borderCollapse: "collapse", borderRadius: 8, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.08)" }}>
-        <thead style={{ fontSize:22 }}>
-          <tr>
-            <th style={{ padding: 14, textAlign: "left", fontWeight: "bold", color: "#1e3a8a" }}>SN</th>
-            <th style={{ padding: 14, textAlign: "left", fontWeight: "bold", color: "#1e3a8a" }}>Name</th>
-            <th style={{ padding: 14, textAlign: "left", fontWeight: "bold", color: "#1e3a8a" }}>Email</th>
-            <th style={{ padding: 14, textAlign: "left", fontWeight: "bold", color: "#1e3a8a" }}>Gender</th>
-            <th style={{ padding: 14, textAlign: "left", fontWeight: "bold", color: "#1e3a8a" }}>Role</th>
-            <th style={{ padding: 14, textAlign: "center", fontWeight: "bold", color: "#1e3a8a" }}>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {currentUsers.map((u, idx) => (
-            <tr key={u._id} style={{ borderBottom: "1px solid #e5e7eb", transition: "background-color 0.2s", cursor: "default" }}
-                onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#f1f5f9"}
-                onMouseOut={(e) => e.currentTarget.style.backgroundColor = "#fff"}>
-              <td style={{ padding: 12, fontSize:18 }}>{indexOfFirstUser + idx + 1}</td>
-              <td style={{ padding: 12,  fontSize:18  }}>{u.name}</td>
-              <td style={{ padding: 12,  fontSize:18  }}>{u.email}</td>
-              <td style={{ padding: 12 ,  fontSize:18 }}>{u.gender}</td>
-              <td style={{ padding: 12, color: u.role === "admin" ? "green" : u.role === "reader" ? "#ef4444" : "#111" ,  fontSize:20 }}>{u.role}</td>
-              <td style={{ padding: 12, textAlign: "center",  fontSize:18  }}>
-                {/* {u.role !== "admin" && <button style={actionBtnStyle("#10b981", 30)} onClick={() => handlePromote(u)}>➕Promote</button>} */}
-                <button style={actionBtnStyle("#2563eb", 30)} onClick={() => setEditUser(u)}>Edit</button>
-                <button style={actionBtnStyle("#dc2626", 30)} onClick={() => handleDelete(u._id)}>Delete</button>
-              </td>
+      {/* Responsive table wrapper */}
+      <div style={{ overflowX: "auto", marginTop: 20 }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", borderRadius: 8, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.08)" }}>
+          <thead style={{ fontSize:22 }}>
+            <tr>
+              <th style={{ padding: 14, textAlign: "left", fontWeight: "bold", color: "#1e3a8a" }}>SN</th>
+              <th style={{ padding: 14, textAlign: "left", fontWeight: "bold", color: "#1e3a8a" }}>Name</th>
+              <th style={{ padding: 14, textAlign: "left", fontWeight: "bold", color: "#1e3a8a" }}>Email</th>
+              <th style={{ padding: 14, textAlign: "left", fontWeight: "bold", color: "#1e3a8a" }}>Gender</th>
+              <th style={{ padding: 14, textAlign: "left", fontWeight: "bold", color: "#1e3a8a" }}>Role</th>
+              <th style={{ padding: 14, textAlign: "center", fontWeight: "bold", color: "#1e3a8a" }}>Actions</th>
             </tr>
-          ))}
-          {users.length === 0 && <tr><td colSpan="6" style={{ padding: 12, textAlign: "center", color: "#6b7280" }}>No users found</td></tr>}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {currentUsers.map((u, idx) => (
+              <tr key={u._id} style={{ borderBottom: "1px solid #e5e7eb", transition: "background-color 0.2s", cursor: "default" }}
+                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#f1f5f9"}
+                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = "#fff"}>
+                <td style={{ padding: 12, fontSize:18 }}>{indexOfFirstUser + idx + 1}</td>
+                <td style={{ padding: 12,  fontSize:18  }}>{u.name}</td>
+                <td style={{ padding: 12,  fontSize:18  }}>{u.email}</td>
+                <td style={{ padding: 12 ,  fontSize:18 }}>{u.gender}</td>
+                <td style={{ padding: 12, color: u.role === "admin" ? "green" : u.role === "reader" ? "#ef4444" : "#111" ,  fontSize:20 }}>{u.role}</td>
+                <td style={{ padding: 12, textAlign: "center",  fontSize:18  }}>
+                  <button style={actionBtnStyle("#2563eb", 30)} onClick={() => setEditUser(u)}>Edit</button>
+                  <button style={actionBtnStyle("#dc2626", 30)} onClick={() => handleDelete(u._id)}>Delete</button>
+                </td>
+              </tr>
+            ))}
+            {users.length === 0 && <tr><td colSpan="6" style={{ padding: 12, textAlign: "center", color: "#6b7280" }}>No users found</td></tr>}
+          </tbody>
+        </table>
+      </div>
 
       {users.length > usersPerPage && (
-        <div style={{ marginTop: 20, display: "flex", justifyContent: "center", alignItems: "center", gap: 20 }}>
+        <div style={{ marginTop: 20, display: "flex", justifyContent: "center", alignItems: "center", gap: 20, flexWrap:"wrap" }}>
           <button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
