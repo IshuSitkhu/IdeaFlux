@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import NotificationsDropdown from "./NotificationDropdown";
 import SearchUser from "./SearchUser";
@@ -7,6 +7,15 @@ const Navbar = () => {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
   const isLoggedIn = !!localStorage.getItem("token");
+
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 412);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -22,14 +31,14 @@ const Navbar = () => {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: "0.8rem 2rem",
+    padding: isMobile ? "0.5rem 1rem" : "0.8rem 2rem",
     backgroundColor: "#ffffff",
     boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
     fontFamily: "Segoe UI, sans-serif",
   };
 
   const brandStyle = {
-    fontSize: "2rem",
+    fontSize: isMobile ? "1.5rem" : "2rem",
     fontWeight: "700",
     color: "#4f46e5",
     textDecoration: "none",
@@ -42,38 +51,44 @@ const Navbar = () => {
   const linkContainerStyle = {
     display: "flex",
     alignItems: "center",
-    gap: "1rem",
+    gap: isMobile ? "0.5rem" : "1rem",
   };
 
   const profileStyle = {
     display: "flex",
     alignItems: "center",
-    gap: "0.5rem",
-    cursor: "pointer",
-    padding: "0.2rem 0.6rem",
-    borderRadius: "9999px",
-    transition: "background 0.2s",
-  };
-
-  const avatarStyle = {
+    justifyContent: "center",
+    width: isMobile ?"36px":"66px",
+    height: "36px",
+    borderRadius: "50%",
     backgroundColor: "#4f46e5",
     color: "#fff",
-    borderRadius: "50%",
-    width: "36px",
-    height: "36px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
+    cursor: "pointer",
     fontWeight: "bold",
     fontSize: "1rem",
     textTransform: "uppercase",
   };
 
+  const logoutStyle = {
+  background: "transparent",
+  border: "none",
+  color: "#d50707",
+  fontWeight: 500,
+  fontSize: isMobile ? "0.8rem" : "1rem",
+  cursor: "pointer",
+  padding: isMobile ? "0.2rem 0.4rem" : "0.3rem 0.6rem",
+  transition: "color 0.2s",
+};
+
   return (
     <nav style={navStyle}>
       {/* Brand */}
       <Link to="/" style={brandStyle}>
-        <img src="/favicon.ico" alt="Logo" style={{ width: "40px", height: "40px" }} />
+        <img
+          src="/favicon.ico"
+          alt="Logo"
+          style={{ width: isMobile ? "18px" : "40px", height: isMobile ? "28px" : "40px" }}
+        />
         IdeaFlux
       </Link>
 
@@ -85,40 +100,38 @@ const Navbar = () => {
         {isLoggedIn ? (
           <>
             <NotificationsDropdown />
+
             <div
               onClick={() => navigate("/profile")}
               style={profileStyle}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f3f4f6")}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
               title={`Logged in as ${user?.name}`}
             >
-              <div style={avatarStyle}>{user?.name?.charAt(0) || "U"}</div>
-              <span style={{ fontWeight: "600", fontSize: "1rem", color: "#4f46e5" }}>
-                {user?.name}
-              </span>
+              {user?.name?.charAt(0) || "U"}
             </div>
+
             <button
               onClick={handleLogout}
-              style={{
-                background: "#d50707ff",
-                border:"none",
-                fontWeight: 500,
-                fontSize: "1rem",
-                color: "white",
-                cursor: "pointer",
-                transition: "color 0.2s",
-                borderRadius:"50px",
-              }}
-              onMouseEnter={(e) => (e.target.style.backgroundColor = "#f25757ff")}
-              onMouseLeave={(e) => (e.target.style.backgroundColor = "#d50707ff")}
+              style={logoutStyle}
+              onMouseEnter={(e) => (e.target.style.color = "#f25757")}
+              onMouseLeave={(e) => (e.target.style.color = "#d50707")}
             >
               Logout
             </button>
           </>
         ) : (
           <>
-            <Link to="/login" style={{ color: "#4f46e5", fontWeight: 500, textDecoration: "none" }}>Login</Link>
-            <Link to="/register" style={{ color: "#4f46e5", fontWeight: 500, textDecoration: "none" }}>Register</Link>
+            <Link
+              to="/login"
+              style={{ color: "#4f46e5", fontWeight: 500, textDecoration: "none" }}
+            >
+              Login
+            </Link>
+            <Link
+              to="/register"
+              style={{ color: "#4f46e5", fontWeight: 500, textDecoration: "none" }}
+            >
+              Register
+            </Link>
           </>
         )}
       </div>
