@@ -1,4 +1,3 @@
-// src/pages/AdminCategories.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -77,7 +76,6 @@ const AdminCategories = () => {
     fetchCategories();
   }, []);
 
-  // Pagination
   const totalPages = Math.ceil(categories.length / categoriesPerPage);
   const indexOfLast = currentPage * categoriesPerPage;
   const indexOfFirst = indexOfLast - categoriesPerPage;
@@ -91,6 +89,7 @@ const AdminCategories = () => {
     backgroundColor: disabled ? "#d1d5db" : "#3b82f6",
     color: "#fff",
     fontWeight: "bold",
+    width:"100px",
   });
 
   return (
@@ -131,189 +130,201 @@ const AdminCategories = () => {
             transition: "all 0.3s ease",
             marginBottom: "12px",
           }}
-          onFocus={(e) => (e.currentTarget.style.boxShadow = "0 4px 12px rgba(37,99,235,0.3)")}
-          onBlur={(e) => (e.currentTarget.style.boxShadow = "0 3px 8px rgba(0,0,0,0.06)")}
+          onFocus={(e) =>
+            (e.currentTarget.style.boxShadow = "0 4px 12px rgba(37,99,235,0.3)")
+          }
+          onBlur={(e) =>
+            (e.currentTarget.style.boxShadow = "0 3px 8px rgba(0,0,0,0.06)")
+          }
         />
-        
-      </div>
-      <button
+        <button
           onClick={handleAdd}
           style={{
-                width: "100%",
-                padding: "14px 0",
-                backgroundColor: "#2563eb",
-                color: "#fff",
-                border: "none",
-                borderRadius: "10px",
-                cursor: "pointer",
-                fontWeight: 600,
-                fontSize: "15px",
-                transition: "all 0.3s ease",
-                boxShadow: "0 3px 8px rgba(37,99,235,0.3)",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#1e40af")}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#2563eb")}
+            width: "100%",
+            padding: "14px 0",
+            backgroundColor: "#2563eb",
+            color: "#fff",
+            border: "none",
+            borderRadius: "10px",
+            cursor: "pointer",
+            fontWeight: 600,
+            fontSize: "15px",
+            transition: "all 0.3s ease",
+            boxShadow: "0 3px 8px rgba(37,99,235,0.3)",
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#1e40af")}
+          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#2563eb")}
         >
           ➕ Add New Category
         </button>
+      </div>
 
+      {/* Responsive Table */}
+      <div style={{ overflowX: "auto" }}>
         <table
-            style={{
-                width: "100%",
-                borderCollapse: "collapse",
-                marginTop: 10,
-                backgroundColor: "#fff",
-                boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
-                borderRadius: 8,
-                overflow: "hidden",
-                fontSize: "15px",
-            }}
-            >
-            <thead style={{ backgroundColor: "#f3f4f6" }}>
-                <tr>
-                <th style={{ padding: 12, textAlign: "center", fontWeight: 600 }}>SN</th>
-                <th style={{ padding: 12, fontWeight: 600 }}>Category Name</th>
-                <th style={{ padding: 12, textAlign: "center", fontWeight: 600 }}>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {currentCategories.length === 0 ? (
-                <tr>
-                    <td colSpan="3" style={{ textAlign: "center", padding: 20 }}>
-                    No categories available
-                    </td>
-                </tr>
-                ) : (
-                currentCategories.map((cat, idx) => (
-                    <tr
-                    key={cat._id}
-                    style={{
-                        borderBottom: "1px solid #e5e7eb",
-                        transition: "all 0.3s ease",
-                        cursor: "pointer",
-                    }}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = "#f9fafb";
-                        e.currentTarget.style.fontSize = "16px";
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = "#fff";
-                        e.currentTarget.style.fontSize = "15px";
-                    }}
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            backgroundColor: "#fff",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+            borderRadius: 8,
+            overflow: "hidden",
+            fontSize: "15px",
+          }}
+        >
+          <thead style={{ backgroundColor: "#f3f4f6" }}>
+            <tr>
+              <th style={{ padding: 12, textAlign: "center", fontWeight: 600 }}>
+                SN
+              </th>
+              <th style={{ padding: 12, fontWeight: 600 }}>Category Name</th>
+              <th style={{ padding: 12, textAlign: "center", fontWeight: 600 }}>
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentCategories.length === 0 ? (
+              <tr>
+                <td colSpan="3" style={{ textAlign: "center", padding: 20 }}>
+                  No categories available
+                </td>
+              </tr>
+            ) : (
+              currentCategories.map((cat, idx) => (
+                <tr
+                  key={cat._id}
+                  style={{
+                    borderBottom: "1px solid #e5e7eb",
+                    transition: "all 0.3s ease",
+                    cursor: "pointer",
+                  }}
+                >
+                  <td style={{ padding: 12, textAlign: "center", width: "50px" }}>
+                    {indexOfFirst + idx + 1}
+                  </td>
+                  <td style={{ padding: 12 }}>
+                    {editCategory?._id === cat._id ? (
+                      <input
+                        type="text"
+                        value={editCategory.name}
+                        onChange={(e) =>
+                          setEditCategory({ ...editCategory, name: e.target.value })
+                        }
+                        style={{
+                          width: "100%",
+                          padding: "8px 12px",
+                          borderRadius: "6px",
+                          border: "1px solid #cbd5e1",
+                          fontSize: "15px",
+                          transition: "all 0.3s ease",
+                        }}
+                      />
+                    ) : (
+                      cat.name
+                    )}
+                  </td>
+                  <td style={{ padding: 12, textAlign: "center" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "center",
+                        gap: 6,
+                        flexWrap: "nowrap", // prevent wrapping
+                        width:"100px",
+                        allignItems: "center",
+                      }}
                     >
-                    <td style={{ padding: 12, textAlign: "center", width: "50px" }}>
-                        {indexOfFirst + idx + 1}
-                    </td>
-                    <td style={{ padding: 12 }}>
-                        {editCategory?._id === cat._id ? (
-                        <input
-                            type="text"
-                            value={editCategory.name}
-                            onChange={(e) =>
-                            setEditCategory({ ...editCategory, name: e.target.value })
-                            }
+                      {editCategory?._id === cat._id ? (
+                        <>
+                          <button
+                            onClick={() => handleUpdate(cat._id)}
                             style={{
-                            width: "100%",
-                            padding: "8px 12px",
-                            borderRadius: "6px",
-                            border: "1px solid #cbd5e1",
-                            fontSize: "15px",
-                            transition: "all 0.3s ease",
+                              padding: "6px 12px",
+                              borderRadius: 6,
+                              backgroundColor: "#16a34a",
+                              color: "#fff",
+                              cursor: "pointer",
+                              fontWeight: 600,
+                              fontSize: "16px",
+                              minWidth: "60px",
+                              transition: "all 0.2s ease",
                             }}
-                        />
-                        ) : (
-                        cat.name
-                        )}
-                    </td>
-                    <td style={{ padding: 12, textAlign: "center" }}>
-                        <div style={{ display: "flex", justifyContent: "center", gap: 6 }}>
-                        {editCategory?._id === cat._id ? (
-                            <>
-                            <button
-                                onClick={() => handleUpdate(cat._id)}
-                                style={{
-                                padding: "6px 12px",
-                                borderRadius: 6,
-                                backgroundColor: "transparent",
-                                color: "#16a34a",
-                                cursor: "pointer",
-                                fontWeight: 600,
-                                fontSize: "16px",
-                                minWidth: "60px",
-                                transition: "all 0.2s ease",
-                                }}
-                                onMouseEnter={(e) => (e.currentTarget.style.color = "#059669")}
-                                onMouseLeave={(e) => (e.currentTarget.style.color = "#16a34a")}
-                            >
-                                Save
-                            </button>
-                            <button
-                                onClick={() => setEditCategory(null)}
-                                style={{
-                                padding: "6px 12px",
-                                borderRadius: 6,
-                                backgroundColor: "transparent",
-                                color: "#dc2626",
-                                cursor: "pointer",
-                                fontWeight: 600,
-                                fontSize: "16px",
-                                minWidth: "60px",
-                                transition: "all 0.2s ease",
-                                }}
-                                onMouseEnter={(e) => (e.currentTarget.style.color = "#b91c1c")}
-                                onMouseLeave={(e) => (e.currentTarget.style.color = "#dc2626")}
-                            >
-                                Cancel
-                            </button>
-                            </>
-                        ) : (
-                            <>
-                            <button
-                                onClick={() => setEditCategory(cat)}
-                                style={{
-                                padding: "6px 12px",
-                                borderRadius: 6,
-                                backgroundColor: "transparent",
-                                color: "#2563eb",
-                                cursor: "pointer",
-                                fontWeight: 600,
-                                fontSize: "16px",
-                                minWidth: "60px",
-                                transition: "all 0.2s ease",
-                                }}
-                                onMouseEnter={(e) => (e.currentTarget.style.color = "#1d4ed8")}
-                                onMouseLeave={(e) => (e.currentTarget.style.color = "#2563eb")}
-                            >
-                                Edit
-                            </button>
-                            <button
-                                onClick={() => handleDelete(cat._id)}
-                                style={{
-                                padding: "6px 12px",
-                                borderRadius: 6,
-                                backgroundColor: "transparent",
-                                color: "#dc2626",
-                                cursor: "pointer",
-                                fontWeight: 600,
-                                fontSize: "16px",
-                                minWidth: "60px",
-                                transition: "all 0.2s ease",
-                                }}
-                                onMouseEnter={(e) => (e.currentTarget.style.color = "#b91c1c")}
-                                onMouseLeave={(e) => (e.currentTarget.style.color = "#dc2626")}
-                            >
-                                Delete
-                            </button>
-                            </>
-                        )}
-                        </div>
-                    </td>
-                    </tr>
-                ))
-                )}
-            </tbody>
-        </table>
+                            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#059669")}
+                            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#16a34a")}
+                          >
+                            Save
+                          </button>
+                          <button
+                            onClick={() => setEditCategory(null)}
+                            style={{
+                              padding: "6px 12px",
+                              borderRadius: 6,
+                              backgroundColor: "#dc2626",
+                              color: "#fff",
+                              cursor: "pointer",
+                              fontWeight: 600,
+                              fontSize: "16px",
+                              minWidth: "80px",
+                              transition: "all 0.2s ease",
+                            }}
+                            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#b91c1c")}
+                            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#dc2626")}
+                          >
+                            Cancel
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => setEditCategory(cat)}
+                            style={{
+                              padding: "6px 12px",
+                              borderRadius: 6,
+                              backgroundColor: "#2563eb",
+                              color: "#fff",
+                              cursor: "pointer",
+                              fontWeight: 600,
+                              fontSize: "16px",
+                              minWidth: "60px",
+                              transition: "all 0.2s ease",
+                            }}
+                            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#1d4ed8")}
+                            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#2563eb")}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete(cat._id)}
+                            style={{
+                              padding: "6px 12px",
+                              borderRadius: 6,
+                              backgroundColor: "#dc2626",
+                              color: "#fff",
+                              cursor: "pointer",
+                              fontWeight: 600,
+                              fontSize: "16px",
+                              minWidth: "80px",
+                              transition: "all 0.2s ease",
+                            }}
+                            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#b91c1c")}
+                            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#dc2626")}
+                          >
+                            Delete
+                          </button>
+                        </>
+                      )}
+                    </div>
 
+
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
 
       {/* Pagination */}
       {categories.length > categoriesPerPage && (
@@ -324,6 +335,7 @@ const AdminCategories = () => {
             justifyContent: "center",
             alignItems: "center",
             gap: 20,
+            flexWrap: "wrap",
           }}
         >
           <button

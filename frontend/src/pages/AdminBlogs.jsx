@@ -7,19 +7,17 @@ import AdminBlogForm from "../components/AdminBlogForm";
 const AdminBlogs = () => {
   const [blogs, setBlogs] = useState([]);
   const [editingBlog, setEditingBlog] = useState(null);
-  const [showForm, setShowForm] = useState(false); // for Add Blog
+  const [showForm, setShowForm] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const blogsPerPage = 5; // adjust per page
+  const blogsPerPage = 5;
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
-  // Fetch blogs
   const fetchBlogs = async () => {
     try {
       const res = await axios.get("http://localhost:8000/api/admin/blogs", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      // Order by DESC (latest first)
       const sortedBlogs = (res.data.blogs || []).sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
       );
@@ -34,7 +32,6 @@ const AdminBlogs = () => {
     fetchBlogs();
   }, []);
 
-  // Delete blog
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this blog?")) return;
     try {
@@ -49,7 +46,6 @@ const AdminBlogs = () => {
     }
   };
 
-  // Edit blog
   const handleEdit = (id) => {
     const blogToEdit = blogs.find((b) => b._id === id);
     if (blogToEdit) {
@@ -63,7 +59,6 @@ const AdminBlogs = () => {
     }
   };
 
-  // Pagination calculation
   const totalPages = Math.ceil(blogs.length / blogsPerPage);
   const indexOfLastBlog = currentPage * blogsPerPage;
   const indexOfFirstBlog = indexOfLastBlog - blogsPerPage;
@@ -77,6 +72,7 @@ const AdminBlogs = () => {
     backgroundColor: disabled ? "#d1d5db" : "#3b82f6",
     color: "#fff",
     fontWeight: "bold",
+    width:"100px",
   });
 
   return (
@@ -99,31 +95,29 @@ const AdminBlogs = () => {
         Admin Panel - Manage Blogs
       </h1>
 
-      {/* Add Blog Button */}
       {!showForm && !editingBlog && (
         <button
           onClick={() => setShowForm(true)}
           style={{
-                width: "100%",
-                padding: "14px 0",
-                backgroundColor: "#2563eb",
-                color: "#fff",
-                border: "none",
-                borderRadius: "10px",
-                cursor: "pointer",
-                fontWeight: 600,
-                fontSize: "15px",
-                transition: "all 0.3s ease",
-                boxShadow: "0 3px 8px rgba(37,99,235,0.3)",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#1e40af")}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#2563eb")}
+            width: "100%",
+            padding: "14px 0",
+            backgroundColor: "#2563eb",
+            color: "#fff",
+            border: "none",
+            borderRadius: "10px",
+            cursor: "pointer",
+            fontWeight: 600,
+            fontSize: "15px",
+            transition: "all 0.3s ease",
+            boxShadow: "0 3px 8px rgba(37,99,235,0.3)",
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#1e40af")}
+          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#2563eb")}
         >
           ➕ Add New Blog
         </button>
       )}
 
-      {/* Blog Form (Add or Edit) */}
       {(showForm || editingBlog) && (
         <AdminBlogForm
           blog={editingBlog || null}
@@ -139,103 +133,103 @@ const AdminBlogs = () => {
         />
       )}
 
-      {/* Blog Table */}
-      <table
-        style={{
-          width: "100%",
-          borderCollapse: "collapse",
-          marginTop: 20,
-          backgroundColor: "#fff",
-          boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
-          borderRadius: 8,
-          overflow: "hidden",
-        }}
-      >
-        <thead style={{ backgroundColor: "#f9fafb" }}>
-          <tr>
-            <th style={{ padding: 12 }}>SN</th>
-            <th style={{ padding: 12 }}>Image</th>
-            <th style={{ padding: 12 }}>Title</th>
-            <th style={{ padding: 12 }}>Author</th>
-            <th style={{ padding: 12 }}>Date</th>
-            <th style={{ padding: 12 }}>Categories</th>
-            <th style={{ padding: 12 }}>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {currentBlogs.length === 0 ? (
+      {/* Responsive Table Wrapper */}
+      <div style={{ overflowX: "auto", marginTop: 20 }}>
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            backgroundColor: "#fff",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+            borderRadius: 8,
+            overflow: "hidden",
+          }}
+        >
+          <thead style={{ backgroundColor: "#f9fafb" }}>
             <tr>
-              <td colSpan="7" style={{ textAlign: "center", padding: 20 }}>
-                No blogs found
-              </td>
+              <th style={{ padding: 12 }}>SN</th>
+              <th style={{ padding: 12 }}>Image</th>
+              <th style={{ padding: 12 }}>Title</th>
+              <th style={{ padding: 12 }}>Author</th>
+              <th style={{ padding: 12 }}>Date</th>
+              <th style={{ padding: 12 }}>Categories</th>
+              <th style={{ padding: 12 }}>Actions</th>
             </tr>
-          ) : (
-            currentBlogs.map((blog, idx) => (
-              <tr key={blog._id} style={{ borderBottom: "1px solid #e5e7eb" }}>
-                <td style={{ padding: 12 }}>{indexOfFirstBlog + idx + 1}</td>
-                <td style={{ padding: 12 }}>
-                  {blog.image && (
-                    <img
-                      src={blog.image}
-                      alt={blog.title}
-                      style={{
-                        width: 80,
-                        height: 80,
-                        objectFit: "cover",
-                        cursor: "pointer",
-                        borderRadius: 6,
-                      }}
-                      onClick={() => navigate(`/blog/${blog._id}`)}
-                    />
-                  )}
-                </td>
-                <td style={{ padding: 12 }}>{blog.title}</td>
-                <td style={{ padding: 12 }}>
-                  {blog.author?.name || blog.author || "Unknown"}
-                </td>
-                <td style={{ padding: 12 }}>
-                  {new Date(blog.createdAt).toLocaleDateString()}
-                </td>
-                <td style={{ padding: 12 }}>
-                  {(blog.categories || []).join(", ")}
-                </td>
-                <td style={{ padding: 12 }}>
-                  <button
-                    onClick={() => handleEdit(blog._id)}
-                    style={{
-                      marginRight: 6,
-                      marginBottom:8,
-                      padding: "6px 12px",
-                      borderRadius: 6,
-                      border: "none",
-                      backgroundColor: "#2563eb",
-                      color: "#fff",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(blog._id)}
-                    style={{
-                      padding: "6px 12px",
-                      borderRadius: 6,
-                      border: "none",
-                      backgroundColor: "#dc2626",
-                      color: "#fff",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Delete
-                  </button>
+          </thead>
+          <tbody>
+            {currentBlogs.length === 0 ? (
+              <tr>
+                <td colSpan="7" style={{ textAlign: "center", padding: 20 }}>
+                  No blogs found
                 </td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ) : (
+              currentBlogs.map((blog, idx) => (
+                <tr key={blog._id} style={{ borderBottom: "1px solid #e5e7eb" }}>
+                  <td style={{ padding: 12 }}>{indexOfFirstBlog + idx + 1}</td>
+                  <td style={{ padding: 12 }}>
+                    {blog.image && (
+                      <img
+                        src={blog.image}
+                        alt={blog.title}
+                        style={{
+                          width: 80,
+                          height: 80,
+                          objectFit: "cover",
+                          cursor: "pointer",
+                          borderRadius: 6,
+                        }}
+                        onClick={() => navigate(`/blog/${blog._id}`)}
+                      />
+                    )}
+                  </td>
+                  <td style={{ padding: 12 }}>{blog.title}</td>
+                  <td style={{ padding: 12 }}>
+                    {blog.author?.name || blog.author || "Unknown"}
+                  </td>
+                  <td style={{ padding: 12 }}>
+                    {new Date(blog.createdAt).toLocaleDateString()}
+                  </td>
+                  <td style={{ padding: 12 }}>
+                    {(blog.categories || []).join(", ")}
+                  </td>
+                  <td style={{ padding: 12 }}>
+                    <button
+                      onClick={() => handleEdit(blog._id)}
+                      style={{
+                        marginRight: 6,
+                        marginBottom: 8,
+                        padding: "6px 12px",
+                        borderRadius: 6,
+                        border: "none",
+                        backgroundColor: "#2563eb",
+                        color: "#fff",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(blog._id)}
+                      style={{
+                        padding: "6px 12px",
+                        borderRadius: 6,
+                        border: "none",
+                        backgroundColor: "#dc2626",
+                        color: "#fff",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
 
-      {/* Pagination */}
       {blogs.length > blogsPerPage && (
         <div
           style={{
@@ -244,6 +238,7 @@ const AdminBlogs = () => {
             justifyContent: "center",
             alignItems: "center",
             gap: 20,
+            flexWrap: "wrap",
           }}
         >
           <button
