@@ -97,7 +97,7 @@ const CollaborativeRecommendations = ({ userId }) => {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
+              gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
               gap: "20px",
               marginBottom: "16px",
             }}
@@ -112,12 +112,20 @@ const CollaborativeRecommendations = ({ userId }) => {
             ))}
           </div>
 
-          <div style={{ display: "flex", justifyContent: "center", gap: "20px" }}>
+          {/* Pagination Controls */}
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "center",
+              gap: "42px",
+            }}
+          >
             <button
               onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
               disabled={page === 0}
               style={{
-                width: "150px",
+                flex: "1 1 120px",
                 padding: "8px 16px",
                 borderRadius: "6px",
                 backgroundColor: page === 0 ? "#eee" : "black",
@@ -132,7 +140,7 @@ const CollaborativeRecommendations = ({ userId }) => {
               onClick={() => setPage((prev) => Math.min(prev + 1, totalPages - 1))}
               disabled={page >= totalPages - 1}
               style={{
-                width: "150px",
+                flex: "1 1 120px",
                 padding: "8px 16px",
                 borderRadius: "6px",
                 backgroundColor: page >= totalPages - 1 ? "#eee" : "black",

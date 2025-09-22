@@ -105,7 +105,7 @@ const Home = () => {
   }, []);
 
   // Split for "Read More"
-  const initialBlogs = blogs.slice(0, 4);
+  const initialBlogs = blogs.slice(0, 8);
   const extraBlogs = blogs.slice(4);
 
   const handleReadMore = () => {
@@ -165,36 +165,37 @@ const firstOtherIndex = initialBlogs.findIndex(
             🔵 Latest Blogs
           </h2>
 
-          <div
+         <div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", // ✅ now 2 blogs in a row
+    gap: "20px",
+  }}
+>
+  {initialBlogs.length === 0 ? (
+    <p style={{ fontStyle: "italic", color: "#666" }}>No blogs available.</p>
+  ) : (
+    initialBlogs.map((blog, idx) => (
+      <React.Fragment key={blog._id}>
+        {idx === firstOtherIndex && (
+          <p
             style={{
-              display: "grid",
-              gridTemplateColumns: "1fr", // <-- make each blog full width
-              gap: "20px",
+              gridColumn: "1 / -1", // ✅ keeps "Discover more blogs" full row
+              textAlign: "center",
+              fontSize: "18px",
+              color: "#666",
+              margin: "10px 0 0 0",
             }}
           >
-            {initialBlogs.length === 0 ? (
-              <p style={{ fontStyle: "italic", color: "#666" }}>No blogs available.</p>
-            ) : (
-              initialBlogs.map((blog, idx) => (
-                <React.Fragment key={blog._id}>
-                  {idx === firstOtherIndex && (
-                    <p
-                      style={{
-                        width: "100%",
-                        textAlign: "center",
-                        fontSize: "18px",
-                        color: "#666",
-                        margin: "10px 0 0 0",
-                      }}
-                    >
-                      Discover more blogs
-                    </p>
-                  )}
-                  <BlogCard blog={blog} currentUserId={currentUserId} />
-                </React.Fragment>
-              ))
-            )}
-          </div>
+            Discover more blogs
+          </p>
+        )}
+        <BlogCard blog={blog} currentUserId={currentUserId} />
+      </React.Fragment>
+    ))
+  )}
+</div>
+
 
   {/* Read More Button */}
           {extraBlogs.length > 0 && !showAllBlogs && (
@@ -370,3 +371,4 @@ const firstOtherIndex = initialBlogs.findIndex(
 };
 
 export default Home;
+

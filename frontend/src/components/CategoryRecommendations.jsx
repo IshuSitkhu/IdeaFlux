@@ -28,20 +28,11 @@ const CategoryRecommendations = ({ currentUserId }) => {
           setNoRecs(true);
           setBlogs([]);
         } else {
-          // 🔽 Sort blogs by likes count (descending)
           const sorted = [...recommendations].sort(
             (a, b) => (b.likes?.length || 0) - (a.likes?.length || 0)
           );
-         console.log(
-  "Sorted by likes:",
-  sorted.map((blog, index) => ({
-    index: index + 1,
-    title: blog.title,
-    likes: blog.likes?.length || 0,
-  }))
-);
           setBlogs(sorted);
-          setPage(0); // reset page when blogs update
+          setPage(0);
         }
       } catch (error) {
         console.error("❌ Error fetching category recommendations:", error);
@@ -61,7 +52,6 @@ const CategoryRecommendations = ({ currentUserId }) => {
   if (!currentUserId) return null;
 
   return (
-    
     <div
       style={{
         padding: "20px",
@@ -92,11 +82,10 @@ const CategoryRecommendations = ({ currentUserId }) => {
         </p>
       ) : (
         <>
-        
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
+              gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
               gap: "20px",
               marginBottom: "16px",
             }}
@@ -115,15 +104,16 @@ const CategoryRecommendations = ({ currentUserId }) => {
           <div
             style={{
               display: "flex",
+              flexWrap: "wrap",
               justifyContent: "center",
-              gap: "20px",
+              gap: "42px",
             }}
           >
             <button
               onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
               disabled={page === 0}
               style={{
-                width: "150px",
+                flex: "1 1 120px",
                 padding: "8px 16px",
                 border: "1px solid #ccc",
                 borderRadius: "6px",
@@ -138,7 +128,7 @@ const CategoryRecommendations = ({ currentUserId }) => {
               onClick={() => setPage((prev) => Math.min(prev + 1, totalPages - 1))}
               disabled={page >= totalPages - 1}
               style={{
-                width: "150px",
+                flex: "1 1 120px",
                 padding: "8px 16px",
                 border: "1px solid #ccc",
                 borderRadius: "6px",
@@ -149,14 +139,11 @@ const CategoryRecommendations = ({ currentUserId }) => {
             >
               Next &gt;
             </button>
-            
           </div>
         </>
       )}
     </div>
-    
   );
-  
 };
 
 export default CategoryRecommendations;

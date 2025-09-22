@@ -24,7 +24,7 @@ body {
   margin-bottom: 1.5rem;
 }
 
-input,
+/* input,
 select {
   width: 100%;
   padding: 0.75rem;
@@ -32,9 +32,9 @@ select {
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 1rem;
-}
+} */
 
-button {
+/* button {
   width: 100%;
   padding: 0.75rem;
   background-color: #4f46e5;
@@ -47,11 +47,11 @@ button {
 
 button:hover {
   background-color: #4338ca;
-}
+} */
 
-p {
+/* p {
   margin: 0.5rem 0;
-}
+} */
 
 .activation-container {
   max-width: 500px;
