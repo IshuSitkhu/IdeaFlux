@@ -199,6 +199,7 @@ const MainLayout = () => {
           display: flex;
           align-items: center;
           justify-content: center;
+          color: white;
         }
 
         /* Sidebar links */

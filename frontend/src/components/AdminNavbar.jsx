@@ -1,9 +1,21 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { FaBars } from "react-icons/fa";
+import "./AdminNavbar.css";
 
-const AdminNavbar = () => {
+const AdminNavbar = ({ toggleMobileSidebar }) => {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user"));
+  const admin = JSON.parse(localStorage.getItem("user"));
+  const isLoggedIn = !!localStorage.getItem("token");
+
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -13,48 +25,37 @@ const AdminNavbar = () => {
   };
 
   return (
-    <nav
-      style={{
-        position: "sticky",
-        top: 0,
-        zIndex: 1000,
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: "0.8rem 2rem",
-        backgroundColor: "#ffffff",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-        fontFamily: "Segoe UI, sans-serif",
-      }}
-    >
-      <div style={{ fontSize: "1.8rem", fontWeight: 700, color: "#2274a1" }}>
-        Admin Panel
-      </div>
+    <>
+      <nav className="navbar">
+        <div className="navbar-left">
+          {isMobile && (
+            <div className="navbar-hamburger" onClick={toggleMobileSidebar}>
+              <FaBars size={22} />
+            </div>
+          )}
 
-      <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-        <span style={{ fontWeight: "600", color: "#2274a1" }}>
-          {user?.name || "Admin"}
-        </span>
-        <button
-          onClick={handleLogout}
-          style={{
-            background: "#d50707ff",
-            border: "none",
-            fontWeight: 500,
-            fontSize: "1rem",
-            color: "white",
-            cursor: "pointer",
-            transition: "background 0.2s",
-            borderRadius: "50px",
-            padding: "6px 12px",
-          }}
-          onMouseEnter={(e) => (e.target.style.backgroundColor = "#f25757ff")}
-          onMouseLeave={(e) => (e.target.style.backgroundColor = "#d50707ff")}
-        >
-          Logout
-        </button>
-      </div>
-    </nav>
+          <Link to="/admin" className="navbar-brand">
+            <img src="/favicon.ico" alt="Logo" className="navbar-logo" />
+            AdminPanel
+          </Link>
+        </div>
+
+        {!isMobile && isLoggedIn && (
+          <div className="navbar-links">
+            <div
+              onClick={() => navigate("/admin/profile")}
+              className="navbar-profile"
+              title={`Logged in as ${admin?.name}`}
+            >
+              {admin?.name?.charAt(0) || "A"}
+            </div>
+            <button className="navbar-logout" onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
+        )}
+      </nav>
+    </>
   );
 };
 

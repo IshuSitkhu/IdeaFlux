@@ -68,7 +68,7 @@ const AdminUserForm = ({ user, onSubmit, onCancel }) => {
 
   const submitBtnStyle = {
     padding: "8px 16px",
-    backgroundColor: "#4f46e5",
+    backgroundColor: "#2274a1",
     color: "#fff",
     fontWeight: "bold",
     border: "none",
@@ -116,7 +116,7 @@ const AdminUserForm = ({ user, onSubmit, onCancel }) => {
         value={form.name}
         onChange={handleChange}
         style={inputStyle}
-        onFocus={(e) => e.target.style.borderColor = "#4f46e5"}
+        onFocus={(e) => e.target.style.borderColor = "#2274a1"}
         onBlur={(e) => e.target.style.borderColor = "#cbd5e1"}
       />
 
@@ -127,7 +127,7 @@ const AdminUserForm = ({ user, onSubmit, onCancel }) => {
         value={form.email}
         onChange={handleChange}
         style={inputStyle}
-        onFocus={(e) => e.target.style.borderColor = "#4f46e5"}
+        onFocus={(e) => e.target.style.borderColor = "#2274a1"}
         onBlur={(e) => e.target.style.borderColor = "#cbd5e1"}
       />
 
@@ -138,7 +138,7 @@ const AdminUserForm = ({ user, onSubmit, onCancel }) => {
         value={form.password}
         onChange={handleChange}
         style={inputStyle}
-        onFocus={(e) => e.target.style.borderColor = "#4f46e5"}
+        onFocus={(e) => e.target.style.borderColor = "#2274a1"}
         onBlur={(e) => e.target.style.borderColor = "#cbd5e1"}
         required={!user}
       />
@@ -148,7 +148,7 @@ const AdminUserForm = ({ user, onSubmit, onCancel }) => {
         value={form.role}
         onChange={handleChange}
         style={selectStyle}
-        onFocus={(e) => e.target.style.borderColor = "#4f46e5"}
+        onFocus={(e) => e.target.style.borderColor = "#2274a1"}
         onBlur={(e) => e.target.style.borderColor = "#cbd5e1"}
       >
         <option value="reader">Reader</option>
@@ -160,7 +160,7 @@ const AdminUserForm = ({ user, onSubmit, onCancel }) => {
         value={form.gender}
         onChange={handleChange}
         style={selectStyle}
-        onFocus={(e) => e.target.style.borderColor = "#4f46e5"}
+        onFocus={(e) => e.target.style.borderColor = "#2274a1"}
         onBlur={(e) => e.target.style.borderColor = "#cbd5e1"}
       >
         <option value="male">Male</option>
@@ -171,8 +171,8 @@ const AdminUserForm = ({ user, onSubmit, onCancel }) => {
       <button
         type="submit"
         style={submitBtnStyle}
-        onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#4338ca"}
-        onMouseOut={(e) => e.currentTarget.style.backgroundColor = "#4f46e5"}
+        onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#2274a1"}
+        onMouseOut={(e) => e.currentTarget.style.backgroundColor = "#2274a1db"}
       >
         {user ? "Update" : "Add"}
       </button>
