@@ -37,19 +37,18 @@ const RecommendPage = () => {
     <div
       style={{
         minHeight: "100vh",
-        padding: "2rem",
-        maxWidth: "90rem",
+        padding: "2rem 1rem",
+        maxWidth: "1200px",
         margin: "0 auto",
         fontFamily: "'Inter', sans-serif",
-        background: "linear-gradient(135deg, #f0f4f8, #ffffff)",
       }}
     >
       <h1
         style={{
-          fontSize: "2.8rem",
+          fontSize: "2.5rem",
           fontWeight: "bold",
           marginBottom: "2rem",
-          color: "#D97706", // yellow-500
+          color: "#D97706",
           textAlign: "center",
         }}
       >
@@ -59,10 +58,11 @@ const RecommendPage = () => {
       <div
         style={{
           display: "flex",
+          flexDirection: "column",
           gap: "1rem",
           marginBottom: "2rem",
           justifyContent: "center",
-          flexWrap: "wrap",
+          alignItems: "center",
         }}
       >
         <input
@@ -72,8 +72,7 @@ const RecommendPage = () => {
           onChange={(e) => setInputTitle(e.target.value)}
           onKeyDown={handleKeyDown}
           style={{
-            flexGrow: 1,
-            minWidth: "250px",
+            width: "100%",
             maxWidth: "600px",
             padding: "0.6rem 1rem",
             borderRadius: "12px",
@@ -85,13 +84,15 @@ const RecommendPage = () => {
           onFocus={(e) =>
             (e.target.style.boxShadow = "0 0 0 3px rgba(37,99,235,0.2)")
           }
-          onBlur={(e) => (e.target.style.boxShadow = "0 2px 6px rgba(0,0,0,0.08)")}
+          onBlur={(e) =>
+            (e.target.style.boxShadow = "0 2px 6px rgba(0,0,0,0.08)")
+          }
         />
         <button
           onClick={() => fetchRecommendations(inputTitle)}
           disabled={loading}
           style={{
-            backgroundColor: "#2563EB",
+            backgroundColor: "#2274a1",
             color: "#fff",
             padding: "0.6rem 1.5rem",
             borderRadius: "12px",
@@ -104,12 +105,12 @@ const RecommendPage = () => {
             transition: "all 0.3s ease",
           }}
           onMouseOver={(e) => {
-            e.currentTarget.style.background = "#1e40af";
+            e.currentTarget.style.background = "#2274a1e7";
             e.currentTarget.style.transform = "translateY(-2px)";
             e.currentTarget.style.boxShadow = "0 6px 16px rgba(37,99,235,0.4)";
           }}
           onMouseOut={(e) => {
-            e.currentTarget.style.background = "#2563EB";
+            e.currentTarget.style.background = "#2274a1";
             e.currentTarget.style.transform = "translateY(0)";
             e.currentTarget.style.boxShadow = "0 4px 12px rgba(37,99,235,0.3)";
           }}
@@ -123,7 +124,7 @@ const RecommendPage = () => {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
             gap: "1.5rem",
             transition: "all 0.3s ease",
           }}

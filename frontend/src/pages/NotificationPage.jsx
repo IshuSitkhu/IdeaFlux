@@ -142,7 +142,7 @@ const NotificationPanel = () => {
                       goToSenderProfile(n.sender._id);
                     }}
                     style={{
-                      color: "#2563eb",
+                      color: "#2274a1",
                       fontWeight: 600,
                       cursor: "pointer",
                     }}

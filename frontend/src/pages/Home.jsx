@@ -146,7 +146,7 @@ const firstOtherIndex = initialBlogs.findIndex(
         overflowX: "hidden",
       }}
     >
-      <h1 style={{ fontWeight: "700", marginBottom: 8 }}>
+      <h1 style={{ fontWeight: "300", marginBottom: 8 }}>
         Welcome{user?.name ? `, ${user.name}` : ""}
       </h1>
 
@@ -155,20 +155,20 @@ const firstOtherIndex = initialBlogs.findIndex(
         <div style={{ flex: 1, minWidth: "300px" }}>
           <h2
             style={{
-              fontWeight: "600",
+              fontWeight: "400",
               marginBottom: 16,
-              borderBottom: "2px solid #4f46e5",
+              borderBottom: "2px solid #2274a1",
               paddingBottom: 6,
-              color: "#4f46e5",
+              color: "#2274a1",
             }}
           >
-            🔵 Latest Blogs
+            Latest Blogs
           </h2>
 
          <div
   style={{
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", // ✅ now 2 blogs in a row
+    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
     gap: "20px",
   }}
 >
@@ -224,7 +224,7 @@ const firstOtherIndex = initialBlogs.findIndex(
         <div style={{ flex: "0 0 350px", maxWidth: "100%" }}>
           <h2
             style={{
-              fontWeight: "600",
+              fontWeight: "400",
               marginBottom: 16,
               borderBottom: "2px solid #ef4444",
               paddingBottom: 6,

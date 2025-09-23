@@ -170,7 +170,7 @@ const BlogDetail = () => {
           <button
             type="submit"
             style={{
-              background: "#4f46e5",
+              background: "#2274a1",
               color: "#fff",
               padding: "8px 16px",
               border: "none",

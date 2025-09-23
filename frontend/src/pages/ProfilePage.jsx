@@ -70,7 +70,7 @@ const ProfilePage = () => {
       >
         <div
           style={{
-            backgroundColor: "#4f46e5",
+            backgroundColor: "#2274a1",
             color: "white",
             borderRadius: "50%",
             width: 56,
@@ -108,7 +108,7 @@ const ProfilePage = () => {
         }}
       />
 
-      <h2 style={{ marginBottom: "1.5rem", color: "#4f46e5" }}>Your Posts</h2>
+      <h2 style={{ marginBottom: "1.5rem", color: "#2274a1" }}>Your Posts</h2>
 
       {loading ? (
         <p

@@ -136,7 +136,7 @@ const BlogCard = ({ blog, compact = false, currentUserId }) => {
     width: "40px",
     height: "40px",
     borderRadius: "50%",
-    background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+    background: "linear-gradient(135deg, #2274a1)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -198,7 +198,7 @@ const BlogCard = ({ blog, compact = false, currentUserId }) => {
   };
 
   const readMoreStyle = {
-    color: "#3b82f6",
+    color: "#2274a1",
     fontWeight: "500",
     marginLeft: "4px",
     cursor: "pointer",
@@ -269,7 +269,7 @@ const BlogCard = ({ blog, compact = false, currentUserId }) => {
 
   const postButtonStyle = {
     padding: "8px 16px",
-    backgroundColor: "#3b82f6",
+    backgroundColor: "#2274a1",
     color: "white",
     border: "none",
     borderRadius: "8px",
@@ -485,7 +485,7 @@ const BlogCard = ({ blog, compact = false, currentUserId }) => {
                 }
               }}
               onFocus={(e) => {
-                e.target.style.borderColor = "#3b82f6";
+                e.target.style.borderColor = "#2274a1";
               }}
               onBlur={(e) => {
                 e.target.style.borderColor = "#d1d5db";
@@ -498,7 +498,7 @@ const BlogCard = ({ blog, compact = false, currentUserId }) => {
                 e.target.style.backgroundColor = "#2563eb";
               }}
               onMouseLeave={(e) => {
-                e.target.style.backgroundColor = "#3b82f6";
+                e.target.style.backgroundColor = "#2274a1";
               }}
             >
               Post Comment

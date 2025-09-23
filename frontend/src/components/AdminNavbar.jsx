@@ -27,12 +27,12 @@ const AdminNavbar = () => {
         fontFamily: "Segoe UI, sans-serif",
       }}
     >
-      <div style={{ fontSize: "1.8rem", fontWeight: 700, color: "#4f46e5" }}>
+      <div style={{ fontSize: "1.8rem", fontWeight: 700, color: "#2274a1" }}>
         Admin Panel
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-        <span style={{ fontWeight: "600", color: "#4f46e5" }}>
+        <span style={{ fontWeight: "600", color: "#2274a1" }}>
           {user?.name || "Admin"}
         </span>
         <button

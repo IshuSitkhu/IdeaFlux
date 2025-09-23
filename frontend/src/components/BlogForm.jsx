@@ -27,16 +27,14 @@ const BlogForm = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await axios.get("http://localhost:8000/api/admin/categories"); 
+        const res = await axios.get("http://localhost:8000/api/admin/categories");
         console.log("Categories API response:", res.data);
 
-        // Use the array from API; adjust according to your backend response
-        // e.g., res.data.categories if nested
         setCategories(Array.isArray(res.data) ? res.data : res.data.categories || []);
       } catch (err) {
         console.error("Error fetching categories:", err.response || err.message);
         toast.error("❌ Failed to fetch categories");
-        setCategories([]); // prevent crash
+        setCategories([]);
       }
     };
     fetchCategories();
@@ -66,7 +64,6 @@ const BlogForm = () => {
     let imageUrl = "";
 
     try {
-      // Upload image if selected
       if (form.image) {
         const imgData = new FormData();
         imgData.append("image", form.image);
@@ -84,8 +81,7 @@ const BlogForm = () => {
         imageUrl = uploadRes.data.imageUrl;
       }
 
-      // Submit blog
-      const res = await axios.post(
+      await axios.post(
         "http://localhost:8000/api/blog",
         {
           title: form.title,
@@ -103,7 +99,6 @@ const BlogForm = () => {
       toast.success("✅ Blog published successfully!");
       navigate("/profile");
 
-      // Reset form
       setForm({ title: "", image: null, content: "", categories: "" });
       setPreview(null);
     } catch (err) {
@@ -112,7 +107,7 @@ const BlogForm = () => {
     }
   };
 
-  // Inline styles
+  // Styles
   const styles = {
     formContainer: {
       maxWidth: 950,
@@ -127,6 +122,7 @@ const BlogForm = () => {
       display: "flex",
       gap: "32px",
       alignItems: "flex-start",
+      flexWrap: "wrap", // allow wrapping
     },
     leftSide: {
       flex: 1,
@@ -158,7 +154,7 @@ const BlogForm = () => {
     },
     button: {
       padding: "14px 0",
-      background: "linear-gradient(135deg, #2563eb 0%, #1e40af 100%)",
+      background: "linear-gradient(135deg, #2274a1 0%, #1e40af 100%)",
       color: "#fff",
       fontSize: "17px",
       borderRadius: "12px",
@@ -199,85 +195,114 @@ const BlogForm = () => {
   };
 
   return (
-    <form style={styles.formContainer} onSubmit={handleSubmit}>
-      <div style={styles.flexRow}>
-        <div style={styles.leftSide}>
-          <input
-            type="text"
-            name="title"
-            placeholder="Title"
-            value={form.title}
-            onChange={handleChange}
-            required
-            style={styles.input}
-          />
+    <>
+      <form style={styles.formContainer} onSubmit={handleSubmit}>
+        <div style={styles.flexRow} className="blog-flex">
+          <div style={styles.leftSide}>
+            <input
+              type="text"
+              name="title"
+              placeholder="Title"
+              value={form.title}
+              onChange={handleChange}
+              required
+              style={styles.input}
+              className="blog-input"
+            />
 
-          <select
-            name="categories"
-            value={form.categories}
-            onChange={handleChange}
-            required
-            style={{
-              width: "100%",
-              padding: "14px 16px",
-              borderRadius: "12px",
-              border: "1px solid #e2e8f0",
-              fontSize: "16px",
-              background: "rgba(255,255,255,0.95)",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-              transition: "all 0.3s ease",
-              cursor: "pointer",
-              color: "#1f2937",
-            }}
-          >
-            <option value="" disabled>
-              Select a category
-            </option>
-            {Array.isArray(categories) &&
-              categories.map((cat) => (
-                <option key={cat._id || cat.id} value={cat.name}>
-                  {cat.name}
-                </option>
-              ))}
-          </select>
+            <select
+              name="categories"
+              value={form.categories}
+              onChange={handleChange}
+              required
+              className="blog-select"
+              style={{
+                width: "100%",
+                padding: "14px 16px",
+                borderRadius: "12px",
+                border: "1px solid #e2e8f0",
+                fontSize: "16px",
+                background: "rgba(255,255,255,0.95)",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                transition: "all 0.3s ease",
+                cursor: "pointer",
+                color: "#1f2937",
+              }}
+            >
+              <option value="" disabled>
+                Select a category
+              </option>
+              {Array.isArray(categories) &&
+                categories.map((cat) => (
+                  <option key={cat._id || cat.id} value={cat.name}>
+                    {cat.name}
+                  </option>
+                ))}
+            </select>
 
-          <textarea
-            name="content"
-            placeholder="Write your blog content here..."
-            value={form.content}
-            onChange={handleChange}
-            required
-            style={styles.textarea}
-          />
+            <textarea
+              name="content"
+              placeholder="Write your blog content here..."
+              value={form.content}
+              onChange={handleChange}
+              required
+              style={styles.textarea}
+              className="blog-textarea"
+            />
 
-          <input
-            type="file"
-            name="image"
-            accept="image/*"
-            onChange={handleChange}
-            style={styles.input}
-            required
-          />
+            <input
+              type="file"
+              name="image"
+              accept="image/*"
+              onChange={handleChange}
+              style={styles.input}
+              className="blog-input"
+              required
+            />
 
-          <button
-            type="submit"
-            style={styles.button}
-            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#1e40af")}
-            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#2563eb")}
-          >
-            Publish Blog
-          </button>
+            <button
+              type="submit"
+              style={styles.button}
+              className="blog-button"
+              onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#1e40af")}
+              onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#2274a1")}
+            >
+              Publish Blog
+            </button>
+          </div>
+
+          <div style={styles.previewWrapper} className="blog-preview">
+            {preview ? (
+              <img src={preview} alt="Selected preview" style={styles.previewImage} />
+            ) : (
+              <p style={styles.previewText}>Image preview will appear here</p>
+            )}
+          </div>
         </div>
+      </form>
 
-        <div style={styles.previewWrapper}>
-          {preview ? (
-            <img src={preview} alt="Selected preview" style={styles.previewImage} />
-          ) : (
-            <p style={styles.previewText}>Image preview will appear here</p>
-          )}
-        </div>
-      </div>
-    </form>
+      {/* Responsive media queries */}
+      <style>
+        {`
+          @media (max-width: 768px) {
+            .blog-flex {
+              flex-direction: column !important;
+              gap: 20px !important;
+            }
+            .blog-preview {
+              width: 100% !important;
+              height: auto !important;
+            }
+            .blog-input,
+            .blog-textarea,
+            .blog-select,
+            .blog-button {
+              width: 100% !important;
+            }
+          }
+        `}
+      </style>
+    </>
   );
 };
 
