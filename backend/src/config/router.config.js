@@ -7,11 +7,15 @@ const uploadRoutes = require("../modules/upload/upload.route"); // Assuming you 
 const notificationRoutes = require("../modules/notification/notification.route");
 const likeRoutes = require("../modules/like/like.route"); // plural 'likes' to match the URL your Python calls
 const categoryRoutes = require("../modules/admin/categories/category.routes");
+const resetRoutes = require("../modules/auth/auth.reset.routes");
+
 
 
 const router = express.Router();
 
 router.use("/api/auth", authRoutes);
+router.use("/api/auth", resetRoutes);
+
 router.use("/api/user", userRoutes); 
 router.use("/api/admin",adminRoutes);
 router.use("/api/admin/categories", categoryRoutes);

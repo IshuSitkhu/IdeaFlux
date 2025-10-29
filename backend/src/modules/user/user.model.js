@@ -30,10 +30,15 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+
     isActive: {
-    type: Boolean,
-    default: true,
-    }, // Optional: for email activation
+      type: Boolean,
+      default: true,
+    },
+
+    // 🔹 For password reset
+    resetOTP: { type: String, default: null },
+    resetOTPExpiry: { type: Date, default: null },
   },
   {
     versionKey: false,
