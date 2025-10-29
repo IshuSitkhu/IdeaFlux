@@ -88,9 +88,14 @@ const Login = () => {
               <label>
                 <input type="checkbox" /> Remember me
               </label>
-              <button type="button" className="forgot-btn">
+              <button
+                type="button"
+                className="forgot-btn"
+                onClick={() => navigate("/forgot-password")}
+              >
                 Forgot password?
               </button>
+
             </div>
 
             <button type="submit" className="login-btn">

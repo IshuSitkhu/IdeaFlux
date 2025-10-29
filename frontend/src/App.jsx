@@ -20,16 +20,24 @@ import RecommendationResult from "./pages/RecommendationResult";
 import NotificationDropDown from "./components/NotificationDropdown";
 import NotificationsPage from "./pages/NotificationPage";
 import NotFound from "./pages/NotFound";
+import ForgotPassword from "./pages/ForgetPassword.jsx";
+import VerifyOTP from "./pages/VerifyOTP.jsx";
+import ResetPassword from "./pages/ResetPassword.jsx";
+
+
 
 import AdminUsers from "./pages/AdminUsers";
 import AdminBlogs from "./pages/AdminBlogs";
 import AdminPage from "./pages/AdminPage";
 import AdminUpdate from "./pages/AdminUpdate";
 import AdminCategories from "./pages/AdminCategories";
+import AdminLikes from "./pages/AdminLikes.jsx";
 
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import "@fortawesome/fontawesome-svg-core/styles.css";
+import { Import } from "lucide-react";
+
 
 //  Admin route protection
 const AdminRoute = ({ children }) => {
@@ -76,6 +84,7 @@ function App() {
           <Route path="users" element={<AdminUsers />} />
           <Route path="blogs" element={<AdminBlogs />} />
           <Route path="categories" element={<AdminCategories />} />
+          <Route path="likes" element={<AdminLikes />} />
         </Route>
 
         {/* Admin-specific routes (still protected) */}
@@ -91,6 +100,10 @@ function App() {
         {/* Public/auth routes */}
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/verify-otp" element={<VerifyOTP />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+
         <Route path="/activate/:token" element={<ActivateAccount />} />
 
         {/* Fallback route */}

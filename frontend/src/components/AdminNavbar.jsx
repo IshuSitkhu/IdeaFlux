@@ -42,13 +42,7 @@ const AdminNavbar = ({ toggleMobileSidebar }) => {
 
         {!isMobile && isLoggedIn && (
           <div className="navbar-links">
-            <div
-              onClick={() => navigate("/admin/profile")}
-              className="navbar-profile"
-              title={`Logged in as ${admin?.name}`}
-            >
-              {admin?.name?.charAt(0) || "A"}
-            </div>
+            
             <button className="navbar-logout" onClick={handleLogout}>
               Logout
             </button>

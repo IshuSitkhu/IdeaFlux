@@ -11,6 +11,7 @@ import {
   faChevronRight,
   faList,
 } from "@fortawesome/free-solid-svg-icons";
+import axios from "axios";
 
 const AdminLayout = () => {
   const navigate = useNavigate();
@@ -21,14 +22,23 @@ const AdminLayout = () => {
     const saved = localStorage.getItem("admin-sidebar-collapsed");
     return saved ? JSON.parse(saved) : false;
   });
-
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024);
+  const [totalLikes, setTotalLikes] = useState(0);
+
+  const fetchTotalLikes = async () => {
+    try {
+      const res = await axios.get("http://localhost:8000/api/admin/likes", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      setTotalLikes(res.data.likes?.length || 0);
+    } catch (err) {
+      console.error("Failed to fetch total likes:", err);
+    }
+  };
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 1024);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    fetchTotalLikes();
   }, []);
 
   const toggleSidebar = () => {
@@ -60,11 +70,7 @@ const AdminLayout = () => {
               <div className="sidebar-backdrop" onClick={toggleMobileSidebar}></div>
             )}
 
-            <nav
-              className={`sidebar ${isCollapsed ? "collapsed" : ""} ${
-                isMobileOpen ? "open" : ""
-              }`}
-            >
+            <nav className={`sidebar ${isCollapsed ? "collapsed" : ""} ${isMobileOpen ? "open" : ""}`}>
               <div className="sidebar-header">
                 {!isCollapsed && <span className="menu-text">Menu</span>}
                 <button className="toggle-btn" onClick={toggleSidebar}>
@@ -92,6 +98,16 @@ const AdminLayout = () => {
                 {!isCollapsed && <span>Categories</span>}
               </Link>
 
+              {/* <Link className="sidebar-link" to="/admin/likes" onClick={() => setIsMobileOpen(false)}>
+                <FontAwesomeIcon icon={faList} style={iconStyle} />
+                {!isCollapsed && <span>Likes</span>}
+                {!isCollapsed && (
+                  <span className="ml-auto bg-blue-500 text-white text-sm px-2 py-0.5 rounded-full">
+                    {totalLikes}
+                  </span>
+                )}
+              </Link> */}
+
               <button onClick={handleLogout} className="sidebar-link logout-btn">
                 <FontAwesomeIcon icon={faRightFromBracket} style={iconStyle} />
                 {!isCollapsed && <span>Logout</span>}
@@ -101,7 +117,8 @@ const AdminLayout = () => {
         )}
 
         <main className="page-content">
-          <Outlet />
+          {/* Pass refreshLikes as context to child pages */}
+          <Outlet context={{ refreshLikes: fetchTotalLikes }} />
         </main>
       </div>
 
