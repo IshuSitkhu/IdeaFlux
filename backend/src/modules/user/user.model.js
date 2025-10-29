@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Blog = require("../blog/blog.model"); 
 
 const userSchema = new mongoose.Schema(
   {
@@ -44,5 +45,24 @@ const userSchema = new mongoose.Schema(
     versionKey: false,
   }
 );
+
+/**
+ * 🔥 Middleware:
+ * Automatically delete all blogs created by a user
+ * before the user document itself is deleted.
+ */
+userSchema.pre("findOneAndDelete", async function (next) {
+  try {
+    const user = await this.model.findOne(this.getFilter());
+    if (user) {
+      await Blog.deleteMany({ author: user._id });
+      console.log(`🗑️ All blogs by user ${user.name} (${user._id}) deleted`);
+    }
+    next();
+  } catch (err) {
+    console.error("Error deleting user blogs:", err);
+    next(err);
+  }
+});
 
 module.exports = mongoose.model("User", userSchema);
