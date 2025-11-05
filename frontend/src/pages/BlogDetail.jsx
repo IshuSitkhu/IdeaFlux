@@ -524,22 +524,35 @@ const BlogDetail = () => {
               Based on content similarity
             </p>
             <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(3, minmax(0, 320px))",
-                gap: "1.5rem",
-                justifyContent: "start",
-              }}
-            >
-              {relatedBlogs.map((relatedBlog) => (
-                <BlogCard
-                  key={relatedBlog._id}
-                  blog={relatedBlog}
-                  currentUserId={currentUserId}
-                  compact={true}
-                />
-              ))}
-            </div>
+  style={{
+    display: "grid",
+    gridTemplateColumns: "repeat(3, minmax(0, 320px))",
+    gap: "1.5rem",
+    justifyContent: "start",
+  }}
+>
+  {relatedBlogs.map((relatedBlog) => (
+    <div key={relatedBlog._id} style={{ textAlign: "center" }}>
+      <BlogCard
+        blog={relatedBlog}
+        currentUserId={currentUserId}
+        compact={true}
+      />
+      {/* Show similarity score below BlogCard */}
+      <p
+        style={{
+          marginTop: "0.5rem",
+          fontSize: "0.8rem",
+          color: "#0369a1",
+          fontWeight: "600",
+        }}
+      >
+        🔍 Similarity Score: {relatedBlog.similarityScore}
+      </p>
+    </div>
+  ))}
+</div>
+
           </div>
         )}
       </div>

@@ -227,17 +227,23 @@ const fetchRecommendations = async (title) => {
     marginInline: "auto",
   }}
 >
+  {recommendations.map((blog) => (
+    <div key={blog._id} style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+      <BlogCard blog={blog} currentUserId={currentUserId} compact={true} />
+      <span
+        style={{
+          fontSize: "0.85rem",
+          color: "#6b7280",
+          textAlign: "center",
+          fontWeight: "500",
+        }}
+      >
+        🔍 Similarity Score: {(blog.similarity * 100).toFixed(0)}%
+      </span>
+    </div>
+  ))}
+</div>
 
-
-            {recommendations.map((blog) => (
-              <BlogCard
-                key={blog._id}
-                blog={blog}
-                currentUserId={currentUserId}
-                compact={true}
-              />
-            ))}
-          </div>
         </>
       ) : (
         !loading && (
@@ -254,44 +260,7 @@ const fetchRecommendations = async (title) => {
         )
       )}
 
-      {/* 🆕 Category-based Recommendations */}
-      {categoryRecs.length > 0 && (
-        <>
-          <h2
-            style={{
-              fontSize: "1.6rem",
-              fontWeight: "600",
-              marginBottom: "1rem",
-              color: "#D97706",
-            }}
-          >
-            More from related categories
-          </h2>
-<div
-  style={{
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-    gap: "1.5rem",
-    justifyContent: "center",
-    alignItems: "start",
-    marginBottom: "3rem",
-    maxWidth: "1000px",
-    marginInline: "auto",
-  }}
->
 
-
-            {categoryRecs.map((blog) => (
-              <BlogCard
-                key={blog._id}
-                blog={blog}
-                currentUserId={currentUserId}
-                compact={true}
-              />
-            ))}
-          </div>
-        </>
-      )}
     </div>
   );
 };
