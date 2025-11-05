@@ -99,6 +99,8 @@ router.get('/latest', async (req, res) => {
 router.get('/trending', blogController.getTrendingBlogs);
 router.get('/category/:category', blogController.getBlogsByCategory);
 
+router.get("/by-categories", blogController.getBlogsByCategories);
+
 // 🔥 FIX: move this line ABOVE `/:id`
 router.get('/recommendation-data', blogController.getAllBlogsForRecommendation);
 router.get('/recommend-content/:title', blogController.getContentRecommendations);

@@ -254,6 +254,7 @@ exports.getTrendingBlogs = async (req, res) => {
 };
 
 // GET /api/blog/category/:category
+// Existing route — keep this as is
 exports.getBlogsByCategory = async (req, res) => {
   try {
     const category = req.params.category;
@@ -270,6 +271,85 @@ exports.getBlogsByCategory = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+
+exports.getBlogsByCategories = async (req, res) => {
+  try {
+    const catsParam = req.query.cats || "";
+    const excludeParam = req.query.excludeIds || "";
+    const limit = parseInt(req.query.limit, 10) || 12;
+
+    const categories = catsParam
+      .split(",")
+      .map((c) => c.trim().toLowerCase())
+      .filter(Boolean);
+
+      //Excluding already shown blogs
+    const excludeIds = excludeParam
+      .split(",")
+      .map((id) => id.trim())
+      .filter(Boolean)
+      .map((id) => (mongoose.Types.ObjectId.isValid(id) ? new mongoose.Types.ObjectId(id) : null))
+      .filter(Boolean);
+
+    if (!categories.length) {
+      return res.status(400).json({ message: "No categories provided" });
+    }
+
+    // Debug log (remove later)
+    console.log("🔍 Fetching category blogs for:", categories, "Excluding:", excludeIds);
+
+    const pipeline = [
+      {
+        $match: {
+          categories: { $in: categories },
+          ...(excludeIds.length ? { _id: { $nin: excludeIds } } : {}),
+        },
+      },
+      {
+        $lookup: {
+          from: "likes",
+          localField: "_id",
+          foreignField: "blogId",
+          as: "likesData",
+        },
+      },
+      {
+        $addFields: {
+          likeCount: { $size: "$likesData" },
+          commentCount: { $size: { $ifNull: ["$comments", []] } },
+        },
+      },
+      {
+        $sort: { likeCount: -1, commentCount: -1, createdAt: -1 },
+      },
+      { $limit: limit },
+      {
+        $project: {
+          likesData: 0,
+        },
+      },
+    ];
+
+    const blogs = await Blog.aggregate(pipeline).exec();
+
+    // Defensive check
+    if (!blogs || blogs.length === 0) {
+      return res.status(200).json({ recommendations: [] });
+    }
+
+    // Populate authors if they exist
+    await Blog.populate(blogs, { path: "author", select: "name" });
+
+    return res.status(200).json({ recommendations: blogs });
+  } catch (err) {
+    console.error("❌ getBlogsByCategories error:", err.message);
+    console.error(err.stack);
+    return res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+
 
 // Get all blogs with full details for recommendations
 exports.getAllBlogsForRecommendation = async (req, res) => {
@@ -313,24 +393,97 @@ exports.getContentRecommendations = (req, res) => {
 
 // blog.controller.js
 
-
+// ============================================
+// 🔄 NEW VERSION: TF-IDF Content-Based Similarity
+// ============================================
 exports.getRelatedBlogs = async (req, res) => {
   try {
-    const blog = await Blog.findById(req.params.blogId);
+    const blogId = req.params.blogId;
+
+    // Verify blog exists
+    const blog = await Blog.findById(blogId);
+    if (!blog) return res.status(404).json({ message: "Blog not found" });
+
+    const scriptPath = path.join(__dirname, "../recommendation/recommend_related.py");
+    const command = `python "${scriptPath}" "${blogId}"`;
+
+    console.log("🔍 Running related blogs recommendation:", command);
+
+    exec(command, { timeout: 15000 }, async (error, stdout, stderr) => {
+      if (error) {
+        console.error("⚠️ Python script error:", error.message);
+        // FALLBACK: Use simple category matching if Python fails
+        return fallbackToSimpleMatch(blogId, res);
+      }
+
+      if (stderr) {
+        console.warn("Python stderr:", stderr);
+      }
+
+      try {
+        const output = JSON.parse(stdout);
+        const relatedBlogs = output.relatedBlogs || [];
+
+        // If no results from TF-IDF, fallback to simple category match
+        if (relatedBlogs.length === 0) {
+          console.warn("⚠️ No TF-IDF results, using category fallback");
+          return fallbackToSimpleMatch(blogId, res);
+        }
+
+        return res.status(200).json({ relatedBlogs });
+      } catch (parseError) {
+        console.error("❌ JSON parse error:", parseError.message);
+        return fallbackToSimpleMatch(blogId, res);
+      }
+    });
+  } catch (err) {
+    console.error("❌ getRelatedBlogs error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// ============================================
+// 🛡️ FALLBACK FUNCTION (OLD SIMPLE METHOD)
+// ============================================
+async function fallbackToSimpleMatch(blogId, res) {
+  try {
+    const blog = await Blog.findById(blogId);
     if (!blog) return res.status(404).json({ message: "Blog not found" });
 
     const category = blog.categories?.[0];
     const relatedBlogs = await Blog.find({
       categories: category,
       _id: { $ne: blog._id }
-    }).limit(3);
+    }).limit(6).populate("author", "name");
 
-    res.status(200).json({ relatedBlogs });
+    console.log("✅ Fallback: Found", relatedBlogs.length, "blogs by category");
+    return res.status(200).json({ relatedBlogs });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
+    console.error("❌ Fallback error:", err);
+    return res.status(500).json({ message: "Server error" });
   }
-};
+}
+
+// ============================================
+// 📝 OLD CODE (BACKUP - DO NOT DELETE!)
+// ============================================
+// exports.getRelatedBlogs = async (req, res) => {
+//   try {
+//     const blog = await Blog.findById(req.params.blogId);
+//     if (!blog) return res.status(404).json({ message: "Blog not found" });
+//
+//     const category = blog.categories?.[0];
+//     const relatedBlogs = await Blog.find({
+//       categories: category,
+//       _id: { $ne: blog._id }
+//     }).limit(3);
+//
+//     res.status(200).json({ relatedBlogs });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: "Server error" });
+//   }
+// };
 
 // blog.controller.js
 exports.getCollaborativeRecommendations = (req, res) => {

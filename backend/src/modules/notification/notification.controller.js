@@ -1,4 +1,4 @@
-const { io } = require("../../config/express.config");
+const { getIO } = require("../../config/socket.config");
 const Notification = require("./notification.model");
 
 exports.sendFollowNotification = async (senderId, receiverId) => {
@@ -10,6 +10,7 @@ exports.sendFollowNotification = async (senderId, receiverId) => {
   });
 
   // Emit to the receiver in real-time
+  const io = getIO();
   io.to(receiverId.toString()).emit("newNotification", notification);
 };
 
@@ -23,6 +24,7 @@ exports.sendLikeNotification = async (senderId, receiverId, blogId) => {
   });
 
   // Emit to the receiver in real-time
+  const io = getIO();
   io.to(receiverId.toString()).emit("newNotification", notification);
 };
 
@@ -36,6 +38,7 @@ exports.sendCommentNotification = async (senderId, receiverId, blogId) => {
   });
 
   // Emit to the receiver in real-time
+  const io = getIO();
   io.to(receiverId.toString()).emit("newNotification", notification);
 };
 
