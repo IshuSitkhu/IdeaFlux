@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { useNavigate, Link } from "react-router-dom";
 import { Heart, MessageCircle, Plus, User, Calendar, Tag } from "lucide-react";
 
-const BlogCard = ({ blog, compact = false, currentUserId }) => {
+const BlogCard = ({ blog, compact = false, currentUserId, onLikeChange }) => {
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [comments, setComments] = useState(blog.comments || []);
@@ -51,6 +51,14 @@ const BlogCard = ({ blog, compact = false, currentUserId }) => {
       );
       setLiked(res.data.liked);
       setLikeCount(res.data.totalLikes);
+
+      // Trigger refresh in parent component if callback provided
+      if (onLikeChange) {
+        console.log("✅ BlogCard: Like successful, calling onLikeChange callback");
+        onLikeChange();
+      } else {
+        console.log("⚠️ BlogCard: No onLikeChange callback provided");
+      }
     } catch (err) {
       if (err.response?.status === 401) {
         toast.info("Session expired. Please login again.");

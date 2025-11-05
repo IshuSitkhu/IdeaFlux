@@ -12,6 +12,7 @@ const Home = () => {
   const [currentUserId, setCurrentUserId] = useState("");
   const [showAllBlogs, setShowAllBlogs] = useState(false);
   const [followingIds, setFollowingIds] = useState([]);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const extraBlogsRef = useRef(null);
   const readMoreBtnRef = useRef(null);
@@ -104,6 +105,17 @@ const Home = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Callback to refresh all data when user likes/unlikes
+  const handleLikeChange = () => {
+    console.log("🔄 Home: Like changed, refreshing all data in 1000ms...");
+    setTimeout(() => {
+      console.log("🔄 Home: Now fetching updated data...");
+      fetchData();
+      // Trigger recommendation components to refresh
+      setRefreshTrigger(prev => prev + 1);
+    }, 1000);
+  };
+
   // Split for "Read More"
   const initialBlogs = blogs.slice(0, 8);
   const extraBlogs = blogs.slice(4);
@@ -190,7 +202,7 @@ const firstOtherIndex = initialBlogs.findIndex(
             Discover more blogs
           </p>
         )}
-        <BlogCard blog={blog} currentUserId={currentUserId} />
+        <BlogCard blog={blog} currentUserId={currentUserId} onLikeChange={handleLikeChange} />
       </React.Fragment>
     ))
   )}
@@ -269,6 +281,7 @@ const firstOtherIndex = initialBlogs.findIndex(
                           blog={blog}
                           currentUserId={currentUserId}
                           compact={true}
+                          onLikeChange={handleLikeChange}
                         />
                       ))}
                     </div>
@@ -300,6 +313,7 @@ const firstOtherIndex = initialBlogs.findIndex(
                               blog={blog}
                               currentUserId={currentUserId}
                               compact={true}
+                              onLikeChange={handleLikeChange}
                             />
                           ))
                         : trendingOthers.slice(0, 5).map((blog) => (
@@ -308,6 +322,7 @@ const firstOtherIndex = initialBlogs.findIndex(
                               blog={blog}
                               currentUserId={currentUserId}
                               compact={true}
+                              onLikeChange={handleLikeChange}
                             />
                           ))}
                     </div>
@@ -322,8 +337,8 @@ const firstOtherIndex = initialBlogs.findIndex(
       {/* Recommendations Section */}
       {user && (
         <div style={{ marginTop: "60px" }}>
-          <CategoryRecommendations currentUserId={user.id} />
-          <CollaborativeRecommendations userId={user.id} />
+          <CategoryRecommendations currentUserId={user.id} refreshTrigger={refreshTrigger} />
+          <CollaborativeRecommendations userId={user.id} refreshTrigger={refreshTrigger} />
         </div>
       )}
 
@@ -339,7 +354,7 @@ const firstOtherIndex = initialBlogs.findIndex(
             }}
           >
             {extraBlogs.map((blog) => (
-              <BlogCard key={blog._id} blog={blog} currentUserId={currentUserId} />
+              <BlogCard key={blog._id} blog={blog} currentUserId={currentUserId} onLikeChange={handleLikeChange} />
             ))}
           </div>
 

@@ -6,31 +6,112 @@ import { toast } from "react-toastify";
 const RecommendPage = () => {
   const [inputTitle, setInputTitle] = useState("");
   const [recommendations, setRecommendations] = useState([]);
+  const [categoryRecs, setCategoryRecs] = useState([]); // 🆕 Category-based blogs
   const [loading, setLoading] = useState(false);
 
   const currentUserId = JSON.parse(localStorage.getItem("user"))?._id;
 
-  const fetchRecommendations = async (title) => {
-    if (!title.trim()) return;
-    try {
-      setLoading(true);
-      const encodedTitle = encodeURIComponent(title.trim());
-      const res = await axios.get(
-        `http://localhost:8000/api/blog/recommend-content/${encodedTitle}`
-      );
-      setRecommendations(res.data.recommendations);
-    } catch (err) {
-      console.error("Recommendation fetch failed", err);
-      toast.error("Something went wrong while fetching recommendations.");
-    } finally {
-      setLoading(false);
+  // Fetch blogs based on title/keyword
+  // replace the existing fetchRecommendations in RecommendPage.jsx with this
+const fetchRecommendations = async (title) => {
+  if (!title?.trim()) return;
+  try {
+    setLoading(true);
+    setRecommendations([]);
+    setCategoryRecs([]);
+
+    const API_BASE = "http://localhost:8000/api"; // or use import.meta.env.VITE_API_BASE_URL
+    const encodedTitle = encodeURIComponent(title.trim());
+
+    console.log("[recommend] Requesting content recs for:", title);
+
+    // 1) Content-based recommendations (TF-IDF)
+    const contentRes = await axios.get(`${API_BASE}/blog/recommend-content/${encodedTitle}`, {
+      timeout: 10000,
+    });
+
+    console.log("[recommend] contentRes status:", contentRes.status, contentRes.data);
+
+    const blogs = contentRes.data?.recommendations || [];
+    setRecommendations(blogs);
+
+    // If no content results, don't fail — try category-based fallback using the search term as category
+    if (blogs.length === 0) {
+      console.warn("[recommend] No content-based results. Trying category fallback...");
+      // try category endpoint using input as category (best-effort)
+      try {
+        const catFallback = await axios.get(`${API_BASE}/blog/category/${encodeURIComponent(title.trim())}`);
+        setCategoryRecs(catFallback.data || []);
+        return;
+      } catch (fallbackErr) {
+        console.warn("[recommend] category fallback failed:", fallbackErr?.response?.data || fallbackErr.message);
+        return;
+      }
     }
-  };
+
+    // 2) Build category list from top content results (top 3 categories)
+    const categories = blogs
+      .flatMap((b) => b.categories || [])
+      .map((c) => (typeof c === "string" ? c.toLowerCase().trim() : c))
+      .filter(Boolean);
+
+    // pick most frequent categories (top 3)
+    const freq = {};
+    categories.forEach((c) => (freq[c] = (freq[c] || 0) + 1));
+    const mainCategories = Object.keys(freq)
+      .sort((a, b) => freq[b] - freq[a])
+      .slice(0, 3);
+
+    console.log("[recommend] derived categories:", mainCategories);
+
+    if (mainCategories.length === 0) {
+      console.warn("[recommend] no categories found in content results");
+      setCategoryRecs([]);
+      return;
+    }
+
+    // Exclude already shown blog ids
+    const excludeIds = blogs.map((b) => b._id).join(",");
+
+    // call your new merged-by-categories endpoint
+    const catsQuery = mainCategories.join(",");
+    const catRes = await axios.get(
+      `${API_BASE}/blog/by-categories?cats=${encodeURIComponent(catsQuery)}&excludeIds=${encodeURIComponent(excludeIds)}&limit=6`,
+      { timeout: 10000 }
+    );
+
+    console.log("[recommend] categoryRes status:", catRes.status, catRes.data);
+
+    // Your backend returns { recommendations: [...] } per the controller above
+    setCategoryRecs(catRes.data?.recommendations || []);
+  } catch (err) {
+    // show better diagnostic info
+    console.error("❌ Recommendation fetch failed:", err);
+
+    // If axios error: print response if exists
+    if (err.response) {
+      console.error("Response status:", err.response.status);
+      console.error("Response data:", err.response.data);
+      toast.error(`Server error: ${err.response.status} — ${err.response.data?.message || JSON.stringify(err.response.data)}`);
+    } else if (err.request) {
+      console.error("No response (request sent):", err.request);
+      toast.error("No response from server. Is backend running?");
+    } else {
+      console.error("Request setup error:", err.message);
+      toast.error("Error preparing request: " + err.message);
+    }
+
+    // keep UI usable (clear lists)
+    setRecommendations([]);
+    setCategoryRecs([]);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      fetchRecommendations(inputTitle);
-    }
+    if (e.key === "Enter") fetchRecommendations(inputTitle);
   };
 
   return (
@@ -55,6 +136,7 @@ const RecommendPage = () => {
         Blog Recommendations
       </h1>
 
+      {/* Search Input */}
       <div
         style={{
           display: "flex",
@@ -119,25 +201,44 @@ const RecommendPage = () => {
         </button>
       </div>
 
-      {/* Recommendation grid */}
+      {/* 🔹 Content-based results */}
       {recommendations.length > 0 ? (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-            gap: "1.5rem",
-            transition: "all 0.3s ease",
-          }}
-        >
-          {recommendations.map((blog) => (
-            <BlogCard
-              key={blog._id}
-              blog={blog}
-              currentUserId={currentUserId}
-              compact={true}
-            />
-          ))}
-        </div>
+        <>
+          <h2
+            style={{
+              fontSize: "1.6rem",
+              fontWeight: "600",
+              marginBottom: "1rem",
+              color: "#374151",
+            }}
+          >
+            Blogs related to “{inputTitle}”
+          </h2>
+
+<div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+    gap: "1.5rem",
+    justifyContent: "center",
+    alignItems: "start",
+    marginBottom: "3rem",
+    maxWidth: "1000px",
+    marginInline: "auto",
+  }}
+>
+
+
+            {recommendations.map((blog) => (
+              <BlogCard
+                key={blog._id}
+                blog={blog}
+                currentUserId={currentUserId}
+                compact={true}
+              />
+            ))}
+          </div>
+        </>
       ) : (
         !loading && (
           <p
@@ -151,6 +252,45 @@ const RecommendPage = () => {
             No recommendations found. Try searching again.
           </p>
         )
+      )}
+
+      {/* 🆕 Category-based Recommendations */}
+      {categoryRecs.length > 0 && (
+        <>
+          <h2
+            style={{
+              fontSize: "1.6rem",
+              fontWeight: "600",
+              marginBottom: "1rem",
+              color: "#D97706",
+            }}
+          >
+            More from related categories
+          </h2>
+<div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+    gap: "1.5rem",
+    justifyContent: "center",
+    alignItems: "start",
+    marginBottom: "3rem",
+    maxWidth: "1000px",
+    marginInline: "auto",
+  }}
+>
+
+
+            {categoryRecs.map((blog) => (
+              <BlogCard
+                key={blog._id}
+                blog={blog}
+                currentUserId={currentUserId}
+                compact={true}
+              />
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

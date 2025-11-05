@@ -37,6 +37,9 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import { Import } from "lucide-react";
+import { useEffect } from "react";
+import "@n8n/chat/style.css";
+import { createChat } from "@n8n/chat";
 
 
 //  Admin route protection
@@ -50,6 +53,16 @@ const AdminRoute = ({ children }) => {
 };
 
 function App() {
+  useEffect(() => {
+    createChat({
+      webhookUrl:
+        "https://tandukarmalisha.app.n8n.cloud/webhook/dd3b2486-6cf2-4cfd-989c-27ce565bb0dc/chat",
+      initialMessages: [
+        "Hi there! 👋",
+        "I am IdeaFlux's bot. How can I assist you today?",
+      ],
+    });
+  }, []);
   return (
     <Router>
       <ToastContainer position="top-center" autoClose={3000} />
