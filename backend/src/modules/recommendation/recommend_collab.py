@@ -1,10 +1,8 @@
-
 import sys
 import json
 import requests
-import pandas as pd
+import math
 from collections import defaultdict, Counter
-from sklearn.metrics.pairwise import cosine_similarity
 
 if len(sys.argv) < 2:
     print("No user ID provided")
@@ -14,6 +12,7 @@ target_user_id = sys.argv[1]
 
 likes_url = "http://localhost:8000/api/likes/all-public"
 
+# Fetch all likes from backend
 try:
     response = requests.get(likes_url)
     response.raise_for_status()
@@ -31,55 +30,69 @@ if not likes:
     print(json.dumps({"recommendations": []}))
     sys.exit()
 
-# Build user-blog matrix: user -> blog liked = 1, else 0
-user_blog_matrix = defaultdict(lambda: defaultdict(int))
+# Build user -> blog matrix (1 if liked, else 0)
+user_blog_matrix = defaultdict(dict)
 for like in likes:
     user = like.get("userId")
     blog = like.get("blogId")
     if user and blog:
         user_blog_matrix[user][blog] = 1
 
-df = pd.DataFrame(user_blog_matrix).T.fillna(0)  # users as rows, blogs as columns
-item_matrix = df.T  # blogs as rows, users as columns (for item-item similarity)
+# Build blog -> user matrix for item-item similarity
+blog_user_matrix = defaultdict(dict)
+for user, blogs in user_blog_matrix.items():
+    for blog, liked in blogs.items():
+        blog_user_matrix[blog][user] = liked
 
-if item_matrix.shape[0] < 2:
+# If less than 2 blogs, exit
+if len(blog_user_matrix) < 2:
     print(json.dumps({"recommendations": []}))
     sys.exit()
 
-# Compute item-item similarity matrix (blog-blog similarity)
-cosine_sim = cosine_similarity(item_matrix)
-similarity_df = pd.DataFrame(cosine_sim, index=item_matrix.index, columns=item_matrix.index)
+# Cosine similarity function
+def cosine_sim(blog1, blog2):
+    users = set(blog1.keys()) | set(blog2.keys())
+    dot = sum(blog1.get(u, 0) * blog2.get(u, 0) for u in users)
+    norm1 = math.sqrt(sum(blog1.get(u, 0) ** 2 for u in users))
+    norm2 = math.sqrt(sum(blog2.get(u, 0) ** 2 for u in users))
+    if norm1 == 0 or norm2 == 0:
+        return 0
+    return dot / (norm1 * norm2)
+
+# Compute similarity for all blog pairs
+similarity = defaultdict(dict)
+blogs = list(blog_user_matrix.keys())
+for i in range(len(blogs)):
+    for j in range(i, len(blogs)):
+        sim = cosine_sim(blog_user_matrix[blogs[i]], blog_user_matrix[blogs[j]])
+        similarity[blogs[i]][blogs[j]] = sim
+        similarity[blogs[j]][blogs[i]] = sim
 
 # Get blogs liked by target user
-if target_user_id not in df.index:
-    # User not found or no likes
+if target_user_id not in user_blog_matrix:
     print(json.dumps({"recommendations": []}))
     sys.exit()
 
-liked_blogs = df.loc[target_user_id]
-liked_blogs = liked_blogs[liked_blogs > 0].index.tolist()
+liked_blogs = [blog for blog, liked in user_blog_matrix[target_user_id].items() if liked]
 
 if not liked_blogs:
     print(json.dumps({"recommendations": []}))
     sys.exit()
 
-# Aggregate similar blogs from all liked blogs
+# Aggregate similar blogs for recommendations
 recommendation_scores = Counter()
-
 for blog_id in liked_blogs:
-    if blog_id not in similarity_df.columns:
-        continue
-    similar_blogs = similarity_df[blog_id].drop(blog_id, errors="ignore")
-    for sim_blog_id, score in similar_blogs.items():
-        if sim_blog_id not in liked_blogs:  # exclude already liked
+    for sim_blog_id, score in similarity[blog_id].items():
+        if sim_blog_id != blog_id and sim_blog_id not in liked_blogs:
             recommendation_scores[sim_blog_id] += score
 
-# Get top 3 recommended blogs
-top_recommendations = recommendation_scores.most_common(5)  # or 3
+# Get top 5 recommendations
+top_recommendations = recommendation_scores.most_common(5)
 
+# Print as JSON
 print(json.dumps({
     "recommendations": [
-        { "blogId": blog_id, "score": round(score, 4) }
+        {"blogId": blog_id, "score": round(score, 4)}
         for blog_id, score in top_recommendations
     ]
 }))

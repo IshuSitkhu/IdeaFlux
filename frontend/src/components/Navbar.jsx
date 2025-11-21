@@ -4,6 +4,11 @@ import { FaBars } from "react-icons/fa";
 import NotificationsDropdown from "./NotificationDropdown";
 import SearchUser from "./SearchUser";
 import "./Navbar.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+
+
+
 
 const Navbar = ({ toggleMobileSidebar }) => {
   const navigate = useNavigate();
@@ -51,6 +56,13 @@ const Navbar = ({ toggleMobileSidebar }) => {
           <div className="navbar-links">
             {isLoggedIn ? (
               <>
+              <Link
+                  className="navbar-link"
+                  to="/add-blog"
+                >
+                  <FontAwesomeIcon icon={faPenToSquare} style={{ marginRight: 6 }} />
+                  Write
+                </Link>
                 <NotificationsDropdown />
                 <div
                   onClick={() => navigate("/profile")}
@@ -65,12 +77,19 @@ const Navbar = ({ toggleMobileSidebar }) => {
               </>
             ) : (
               <>
-                <Link className="navbar-link" to="/login">
-                  Login
+                <Link
+                  className="navbar-link"
+                  to="/register"
+                >
+                  <FontAwesomeIcon icon={faPenToSquare} style={{ marginRight: 6 }} />
+                  Write
                 </Link>
-                <Link className="navbar-link" to="/register">
-                  Register
+
+                <Link className="navbar-get-started" to="/register">
+                  Get Started
                 </Link>
+              
+
               </>
             )}
           </div>

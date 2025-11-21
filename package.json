@@ -1,6 +1,8 @@
 {
   "dependencies": {
     "multer": "^2.0.2",
+    "react-slick": "^0.31.0",
+    "slick-carousel": "^1.8.1",
     "socket.io": "^4.8.1"
   }
 }

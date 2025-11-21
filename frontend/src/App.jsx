@@ -56,7 +56,7 @@ function App() {
   useEffect(() => {
     createChat({
       webhookUrl:
-        "https://tandukarmalisha.app.n8n.cloud/webhook/dd3b2486-6cf2-4cfd-989c-27ce565bb0dc/chat",
+        "https://malsha.app.n8n.cloud/webhook/dd3b2486-6cf2-4cfd-989c-27ce565bb0dc/chat",
       initialMessages: [
         "Hi there! 👋",
         "I am IdeaFlux's bot. How can I assist you today?",

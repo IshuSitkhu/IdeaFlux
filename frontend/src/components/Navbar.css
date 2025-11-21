@@ -112,3 +112,17 @@
     margin: 0;
   }
 }
+
+.navbar-get-started {
+  padding: 8px 16px;
+  background-color: #2274a1; /* Indigo */
+  color: white;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+.navbar-get-started:hover {
+  background-color: #2274a1c7;
+}

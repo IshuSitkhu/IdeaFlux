@@ -1,9 +1,60 @@
-
 import sys
 import requests
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
 import json
+import math
+from collections import defaultdict
+import re
+
+
+STOP_WORDS = {
+    "the", "is", "in", "and", "to", "of", "a", "for", "on", "at", "by", "an",
+    "be", "this", "that", "with", "as", "from", "it", "are", "was", "or", "but"
+}
+
+def tokenize(text):
+    """Tokenize: lowercase, remove punctuation, and exclude stop words"""
+    tokens = re.findall(r'\b\w+\b', text.lower())
+    return [t for t in tokens if t not in STOP_WORDS]  # Remove stop words
+
+def compute_tf(doc_tokens):
+    """Compute term frequency for a document"""
+    tf = defaultdict(int)
+    for token in doc_tokens:
+        tf[token] += 1
+    doc_len = len(doc_tokens)
+    for token in tf:
+        tf[token] /= doc_len
+    return tf
+
+def compute_idf(docs_tokens):
+    """Compute inverse document frequency for all terms"""
+    N = len(docs_tokens)
+    df = defaultdict(int)
+    for tokens in docs_tokens:
+        unique_tokens = set(tokens)
+        for token in unique_tokens:
+            df[token] += 1
+    idf = {}
+    for token, freq in df.items():
+        idf[token] = math.log((N + 1) / (freq + 1)) + 1  # smoothed IDF
+    return idf
+
+def compute_tfidf(tf, idf):
+    """Compute TF-IDF vector for a document"""
+    tfidf = {}
+    for token, tf_val in tf.items():
+        tfidf[token] = tf_val * idf.get(token, 0)
+    return tfidf
+
+def cosine_similarity(vec1, vec2):
+    """Compute cosine similarity between two TF-IDF vectors"""
+    all_tokens = set(vec1.keys()) | set(vec2.keys())
+    dot = sum(vec1.get(tok, 0) * vec2.get(tok, 0) for tok in all_tokens)
+    norm1 = math.sqrt(sum(val ** 2 for val in vec1.values()))
+    norm2 = math.sqrt(sum(val ** 2 for val in vec2.values()))
+    if norm1 == 0 or norm2 == 0:
+        return 0
+    return dot / (norm1 * norm2)
 
 def main():
     if len(sys.argv) < 2:
@@ -13,7 +64,7 @@ def main():
     target_blog_id = sys.argv[1].strip()
 
     try:
-        # Fetch all blogs from backend
+        # Step 1: Fetch all blogs
         response = requests.get("http://localhost:8000/api/blog/recommendation-data", timeout=10)
         data = response.json()
         blogs = data.get("blogs", [])
@@ -22,7 +73,7 @@ def main():
             print(json.dumps({"relatedBlogs": []}))
             return
 
-        # Find the target blog
+        # Step 2: Find target blog
         target_blog = None
         target_index = -1
         for i, blog in enumerate(blogs):
@@ -35,34 +86,32 @@ def main():
             print(json.dumps({"relatedBlogs": []}))
             return
 
-        # Prepare text data for TF-IDF (title + content)
-        titles = [blog.get("title", "") for blog in blogs]
-        contents = [blog.get("content", "") for blog in blogs]
-        combined = [t + " " + c for t, c in zip(titles, contents)]
+        # Step 3: Combine title and content for each blog
+        combined_docs = [blog.get("title", "") + " " + blog.get("content", "") for blog in blogs]
+        tokenized_docs = [tokenize(doc) for doc in combined_docs]
 
-        # Build TF-IDF matrix
-        vectorizer = TfidfVectorizer(stop_words="english", max_features=1000)
-        tfidf_matrix = vectorizer.fit_transform(combined)
+        # Step 4: Compute TF-IDF for all blogs
+        idf = compute_idf(tokenized_docs)
+        tfidf_vectors = [compute_tfidf(compute_tf(tokens), idf) for tokens in tokenized_docs]
 
-        # Get the target blog's vector
-        target_vec = tfidf_matrix[target_index]
+        # Step 5: Compute cosine similarity with the target blog
+        target_vec = tfidf_vectors[target_index]
+        similarity_scores = [cosine_similarity(target_vec, vec) for vec in tfidf_vectors]
 
-        # Calculate cosine similarity between target and all blogs
-        similarity_scores = cosine_similarity(target_vec, tfidf_matrix).flatten()
+        THRESHOLD = 0.05  
 
-        # Create list of (score, blog, index) tuples, excluding the target blog itself
-        blog_scores = []
-        for i, (score, blog) in enumerate(zip(similarity_scores, blogs)):
-            if i != target_index and score > 0.05:  # Exclude target blog and very low scores
-                blog_scores.append((score, blog))
+        # Step 6: Collect blogs above threshold (excluding target)
+        blog_scores = [
+            (score, blog)
+            for i, (score, blog) in enumerate(zip(similarity_scores, blogs))
+            if i != target_index and score > THRESHOLD
+        ]
 
-        # Sort by similarity score (descending)
+        # Step 7: Sort and take top 6
         blog_scores.sort(key=lambda x: x[0], reverse=True)
-
-        # Take top 6 most similar blogs
         top_similar = blog_scores[:6]
 
-        # Format results
+        # Step 8: Prepare result
         results = []
         for score, blog in top_similar:
             author = blog.get("author") or {}
@@ -76,13 +125,13 @@ def main():
                     "_id": author.get("_id"),
                     "name": author.get("name", "Unknown")
                 },
-                "createdAt": blog.get("createdAt")
+                "createdAt": blog.get("createdAt"),
+                "similarityScore": round(float(score), 2)
             })
 
         print(json.dumps({"relatedBlogs": results}))
 
     except Exception as e:
-        # If anything fails, return empty array
         print(json.dumps({"relatedBlogs": [], "error": str(e)}))
 
 if __name__ == "__main__":
