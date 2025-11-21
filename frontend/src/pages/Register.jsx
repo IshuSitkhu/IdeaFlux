@@ -28,7 +28,7 @@ const Register = () => {
     setServerMsg("");
 
     try {
-      const res = await axios.post("http://localhost:8000/api/auth/register", form, {
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/register`, form, {
         withCredentials: true,
       });
 

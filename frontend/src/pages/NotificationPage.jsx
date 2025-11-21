@@ -12,7 +12,7 @@ const NotificationPanel = () => {
   const fetchNotifications = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:8000/api/notification/${currentUser.id}`,
+        `${import.meta.env.VITE_API_BASE_URL}/notification/${currentUser.id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

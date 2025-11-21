@@ -12,7 +12,7 @@ const AdminCategories = () => {
 
   const fetchCategories = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/admin/categories", {
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/admin/categories`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const cats = Array.isArray(res.data) ? res.data : res.data.categories || [];
@@ -28,7 +28,7 @@ const AdminCategories = () => {
     if (!newCategory.trim()) return toast.error("❌ Enter a category name");
     try {
       await axios.post(
-        "http://localhost:8000/api/admin/categories",
+        `${import.meta.env.VITE_API_BASE_URL}/admin/categories`,
         { name: newCategory },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -45,7 +45,7 @@ const AdminCategories = () => {
     if (!editCategory.name.trim()) return toast.error("❌ Enter a category name");
     try {
       await axios.put(
-        `http://localhost:8000/api/admin/categories/${id}`,
+        `${import.meta.env.VITE_API_BASE_URL}/admin/categories/${id}`,
         { name: editCategory.name },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -61,7 +61,7 @@ const AdminCategories = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this category?")) return;
     try {
-      await axios.delete(`http://localhost:8000/api/admin/categories/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/admin/categories/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       toast.success("✅ Category deleted!");

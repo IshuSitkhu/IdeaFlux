@@ -21,7 +21,7 @@ const AdminUsers = () => {
 
     const fetchUsers = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/admin/users", {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/users`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const body = await res.json();
@@ -56,7 +56,7 @@ const AdminUsers = () => {
 
   const handleAddUser = async (form) => {
     try {
-      const res = await fetch("http://localhost:8000/api/admin/users", {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/users`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -73,7 +73,7 @@ const AdminUsers = () => {
 
   const handleUpdateUser = async (user, form) => {
     try {
-      const res = await fetch(`http://localhost:8000/api/admin/users/${user._id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/users/${user._id}`, {
         method: "PATCH",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -91,7 +91,7 @@ const AdminUsers = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     try {
-      const res = await fetch(`http://localhost:8000/api/admin/users/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/users/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
       const body = await res.json();
       if (!res.ok) throw new Error(body.message || "Delete failed");
       setUsers((prev) => prev.filter((u) => u._id !== id));

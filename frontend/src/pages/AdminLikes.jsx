@@ -10,7 +10,7 @@ const AdminLikes = () => {
 
   const fetchLikes = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/admin/likes", {
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/admin/likes`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setLikes(res.data.likes || []);
@@ -24,7 +24,7 @@ const AdminLikes = () => {
     if (!window.confirm("Are you sure you want to delete this like?")) return;
 
     try {
-      await axios.delete(`http://localhost:8000/api/admin/likes/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/admin/likes/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       toast.success("Like deleted successfully!");

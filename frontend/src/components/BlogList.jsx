@@ -11,7 +11,7 @@ const BlogList = () => {
   // Fetch all blogs once
   useEffect(() => {
     axios
-      .get("http://localhost:8000/api/blog")
+      .get(`${import.meta.env.VITE_API_BASE_URL}/blog`)
       .then((res) => {
         setBlogs(res.data);
         setFilteredBlogs(res.data); // initially show all

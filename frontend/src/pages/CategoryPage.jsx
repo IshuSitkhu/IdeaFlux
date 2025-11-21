@@ -12,7 +12,7 @@ const CategoryPage = () => {
     const fetchBlogsByCategory = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:8000/api/blog/category/${categoryName}`
+          `${import.meta.env.VITE_API_BASE_URL}/blog/category/${categoryName}`
         );
         setBlogs(res.data || []);
       } catch (err) {

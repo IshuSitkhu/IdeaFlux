@@ -27,7 +27,7 @@ const BlogForm = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await axios.get("http://localhost:8000/api/admin/categories");
+        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/admin/categories`);
         console.log("Categories API response:", res.data);
 
         setCategories(Array.isArray(res.data) ? res.data : res.data.categories || []);
@@ -69,7 +69,7 @@ const BlogForm = () => {
         imgData.append("image", form.image);
 
         const uploadRes = await axios.post(
-          "http://localhost:8000/api/upload",
+          `${import.meta.env.VITE_API_BASE_URL}/upload`,
           imgData,
           {
             headers: {
@@ -82,7 +82,7 @@ const BlogForm = () => {
       }
 
       await axios.post(
-        "http://localhost:8000/api/blog",
+        `${import.meta.env.VITE_API_BASE_URL}/blog`,
         {
           title: form.title,
           image: imageUrl,

@@ -15,7 +15,7 @@ const NotificationDropdown = () => {
   const fetchNotifications = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:8000/api/notification/${currentUser.id}`,
+        `${import.meta.env.VITE_API_BASE_URL}/notification/${currentUser.id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -50,7 +50,7 @@ const NotificationDropdown = () => {
       if (unreadCount > 0) {
         try {
           await axios.post(
-            `http://localhost:8000/api/notification/mark-read/${currentUser.id}`,
+            `${import.meta.env.VITE_API_BASE_URL}/notification/mark-read/${currentUser.id}`,
             {},
             { headers: { Authorization: `Bearer ${token}` } }
           );

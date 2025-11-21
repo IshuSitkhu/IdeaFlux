@@ -43,7 +43,7 @@ const ActivateAccount = () => {
   useEffect(() => {
     const activate = async () => {
       try {
-        await axios.get(`http://localhost:8000/api/auth/activate/${token}`);
+        await axios.get(`${import.meta.env.VITE_API_BASE_URL}/auth/activate/${token}`);
         setMessage("✅ Account activated successfully! Redirecting to login...");
         setTimeout(() => navigate("/login"), 3000); // Redirect after 3 sec
       } catch (err) {

@@ -23,7 +23,7 @@ const AdminBlogForm = ({ blog = null, onSuccess, onCancelEdit, showForm = false 
     if (!token) return;
     const fetchUsers = async () => {
       try {
-        const res = await axios.get("http://localhost:8000/api/admin/users", {
+        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/admin/users`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const usersList = res.data?.users || [];
@@ -131,7 +131,7 @@ const AdminBlogForm = ({ blog = null, onSuccess, onCancelEdit, showForm = false 
         imgData.append("image", imageFile);
 
         const uploadRes = await axios.post(
-          "http://localhost:8000/api/upload",
+          `${import.meta.env.VITE_API_BASE_URL}/upload`,
           imgData,
           {
             headers: {
@@ -162,13 +162,13 @@ const AdminBlogForm = ({ blog = null, onSuccess, onCancelEdit, showForm = false 
 
       if (blog) {
         await axios.patch(
-          `http://localhost:8000/api/admin/blogs/${blog._id}`,
+          `${import.meta.env.VITE_API_BASE_URL}/admin/blogs/${blog._id}`,
           payload,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         toast.success("Blog updated successfully!");
       } else {
-        await axios.post("http://localhost:8000/api/admin/blogs", payload, {
+        await axios.post(`${import.meta.env.VITE_API_BASE_URL}/admin/blogs`, payload, {
           headers: { Authorization: `Bearer ${token}` },
         });
         toast.success("Blog created successfully!");

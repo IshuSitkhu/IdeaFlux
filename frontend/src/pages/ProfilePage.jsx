@@ -30,7 +30,7 @@ const ProfilePage = () => {
       try {
         setLoading(true);
         const response = await fetch(
-          `http://localhost:8000/api/blog/user/${userId}`,
+          `${import.meta.env.VITE_API_BASE_URL}/blog/user/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -196,7 +196,7 @@ const ProfilePage = () => {
                     const token = localStorage.getItem("token");
                     try {
                       const res = await fetch(
-                        `http://localhost:8000/api/blog/${blog._id}`,
+                        `${import.meta.env.VITE_API_BASE_URL}/blog/${blog._id}`,
                         {
                           method: "DELETE",
                           headers: {

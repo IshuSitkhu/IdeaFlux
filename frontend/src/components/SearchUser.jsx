@@ -21,7 +21,7 @@ const SearchUser = ({ isMobileMenuOpen = false }) => {
 
     try {
       const res = await axios.get(
-        `http://localhost:8000/api/user/search?query=${searchTerm}`,
+        `${import.meta.env.VITE_API_BASE_URL}/user/search?query=${searchTerm}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setResults(res.data.users.slice(0, 4));

@@ -19,7 +19,7 @@ const AuthorProfile = () => {
 
   const fetchAuthor = async () => {
     try {
-      const res = await axios.get(`http://localhost:8000/api/user/${userId}`, {
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/user/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = res.data.user;
@@ -41,7 +41,7 @@ const AuthorProfile = () => {
   const toggleFollow = async () => {
     try {
       const res = await axios.post(
-        `http://localhost:8000/api/user/follow/${userId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/user/follow/${userId}`,
         { currentUserId: currentUser?.id },
         { headers: { Authorization: `Bearer ${token}` } }
       );

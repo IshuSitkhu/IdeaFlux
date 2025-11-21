@@ -15,7 +15,7 @@ const AdminBlogs = () => {
 
   const fetchBlogs = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/admin/blogs", {
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/admin/blogs`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const sortedBlogs = (res.data.blogs || []).sort(
@@ -35,7 +35,7 @@ const AdminBlogs = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this blog?")) return;
     try {
-      await axios.delete(`http://localhost:8000/api/admin/blogs/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/admin/blogs/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       toast.success("Blog deleted successfully!");

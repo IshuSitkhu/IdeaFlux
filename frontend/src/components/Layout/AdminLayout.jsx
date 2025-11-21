@@ -28,7 +28,7 @@ const AdminLayout = () => {
 
   const fetchTotalLikes = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/admin/likes", {
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/admin/likes`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setTotalLikes(res.data.likes?.length || 0);
